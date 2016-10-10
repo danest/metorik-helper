@@ -19,6 +19,7 @@ class Metorik_Helper_API {
 	{
 		require_once( 'api/orders.php' );
 		require_once( 'api/customers.php' );
+		require_once( 'api/products.php' );
 		require_once( 'api/metorik.php' );
 	}
 }
