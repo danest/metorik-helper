@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Metorik Helper
- * Plugin URI: metorik.com
+ * Plugin URI: https://metorik.com
  * Description: Provides some fixes & extensions for WooCommerce, required by Metorik.
- * Version: 0.1
+ * Version: 0.1.0
  * Author Name: Bryce Adams
  * Author URI: bryce.se
 */
@@ -22,6 +22,7 @@ class Metorik_Helper {
 	public function init() {
 		if ( class_exists( 'WooCommerce' ) ) {
 			require_once( 'inc/import.php' );
+			require_once( 'inc/api.php' );
 		} else {
 			add_action( 'admin_notices', array( $this, 'no_wc' ) );
 		}

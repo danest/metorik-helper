@@ -5,7 +5,10 @@
  */
 class Metorik_Import_Helpers {
 	public function __construct() {
-		add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
+		// Only if the metorik_importing_currently is set (through API)
+		if ( get_option( 'metorik_importing_currently', false ) ) {
+			add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
+		}
 	}
 
 	/**
@@ -18,7 +21,9 @@ class Metorik_Import_Helpers {
 	 * to returning a customer's total spent / order count, but if
 	 * you're using Metorik, you have no need for that.
 	 *
-	 * In addition, this plugin could be disabled after importing.
+	 * However, the option for metorik_importing_currently needs to be true
+	 * in order for this override to happen, and that's enabled/disabled
+	 * by the Metorik API, so it's not a huge concern.
 	 */
 	public function filter_user_metadata( $value, $object_id, $meta_key, $single ) {
 		// Check if it's one of the keys we want to filter
