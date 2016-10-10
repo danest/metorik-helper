@@ -16,7 +16,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 	/**
 	 * Customers IDs route definition.
 	 */
-	public function orders_ids_route() {
+	public function customers_ids_route() {
 		register_rest_route( $this->namespace, '/customers/ids/', array(
 			'methods' => WP_REST_Server::READABLE,
 			'callback' => array( $this, 'customers_api_callback' ),
