@@ -4,8 +4,8 @@
  * Plugin URI: https://metorik.com
  * Description: Provides some fixes & extensions for WooCommerce, required by Metorik.
  * Version: 0.1.0
- * Author Name: Bryce Adams
- * Author URI: bryce.se
+ * Author: Metorik
+ * Author URI: https://metorik.com
 */
 
 class Metorik_Helper {
