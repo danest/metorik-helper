@@ -15,11 +15,12 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'customers_ids_route' ) );
 
-		// Temporarily override WC core customers endpoint to fix bug that will be fixed in future WC release
+		// Temporarily override WC core customers/customer endpoints to fix bug that will be fixed in future WC release
 		// This only happens during imports
 		if ( get_option( 'metorik_importing_currently', false ) ) {
 			$this->WC_REST_Customers_Controller = new WC_REST_Customers_Controller();
 			add_action( 'rest_api_init', array( $this, 'customers_route' ) );
+			add_action( 'rest_api_init', array( $this, 'single_customer_route' ) );
 		}
 	}
 
@@ -70,6 +71,45 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 	}
 
 	/**
+	 * Customer (single) route definition.
+	 * This overrides the WC core customers endpoint, so we need
+	 * to include the CREATE method from WC core too
+	 * so that this doesn't break it if it's
+	 * used by the store during imports.
+	 */
+	public function single_customer_route() {
+		register_rest_route( $this->namespace, '/customers/(?P<id>[\d]+)', array(
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_item' ),
+				'permission_callback' => array( $this->WC_REST_Customers_Controller, 'get_item_permissions_check' ),
+				'args'                => array(
+					'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+				),
+			),
+			array(
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => array( $this->WC_REST_Customers_Controller, 'update_item' ),
+				'permission_callback' => array( $this->WC_REST_Customers_Controller, 'update_item_permissions_check' ),
+				'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+			),
+			array(
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => array( $this->WC_REST_Customers_Controller, 'delete_item' ),
+				'permission_callback' => array( $this->WC_REST_Customers_Controller, 'delete_item_permissions_check' ),
+				'args'                => array(
+					'force' => array(
+						'default'     => false,
+						'description' => __( 'Required to be true, as resource does not support trashing.', 'woocommerce' ),
+					),
+					'reassign' => array(),
+				),
+			),
+			'schema' => array( $this->WC_REST_Customers_Controller, 'get_public_item_schema' ),
+		), true );
+	}
+
+	/**
 	 * Callback for the Customer IDs API endpoint.
 	 * 
 	 * @return WP_Error|array
@@ -114,6 +154,26 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		 */
 		$response = rest_ensure_response( $data );
 		$response->set_status( 200 );
+
+		return $response;
+	}
+
+	/**
+	 * Get a single customer.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function get_item( $request ) {
+		$id       = (int) $request['id'];
+		$customer = get_userdata( $id );
+
+		if ( empty( $id ) || empty( $customer->ID ) ) {
+			return new WP_Error( 'woocommerce_rest_invalid_id', __( 'Invalid resource id.', 'woocommerce' ), array( 'status' => 404 ) );
+		}
+
+		$customer = $this->prepare_item_for_response( $customer, $request );
+		$response = rest_ensure_response( $customer );
 
 		return $response;
 	}
