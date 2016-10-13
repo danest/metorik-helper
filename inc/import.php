@@ -24,6 +24,14 @@ class Metorik_Import_Helpers {
 	 * However, the option for metorik_importing_currently needs to be true
 	 * in order for this override to happen, and that's enabled/disabled
 	 * by the Metorik API, so it's not a huge concern.
+	 *
+	 * Note that while we could just remove the order count / total spent
+	 * from the customers.php class where we override the customers API
+	 * endpoints to fix the last order speed issue, that is a temp.
+	 * fix while the last order data is still being returned by
+	 * WC - so we'll remove our overriding later but still
+	 * need to have this code here stopping money spent
+	 * and order count from being calculated by WC.
 	 */
 	public function filter_user_metadata( $value, $object_id, $meta_key, $single ) {
 		// Check if it's one of the keys we want to filter
