@@ -31,7 +31,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		register_rest_route( $this->namespace, '/customers/ids/', array(
 			'methods' => WP_REST_Server::READABLE,
 			'callback' => array( $this, 'customers_ids_api_callback' ),
-			'permission_callback' => array( $this->WC_REST_Customers_Controller, 'get_items_permissions_check' ),
+			'permission_callback' => array( $this, 'get_items_permissions_check' ),
 		) );
 	}
 
@@ -337,6 +337,20 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		 * @param WP_REST_Request  $request   Request object.
 		 */
 		return apply_filters( 'woocommerce_rest_prepare_customer', $response, $customer, $request );
+	}
+
+	/**
+	 * Check whether a given request has permission to read customers.
+	 *
+	 * @param  WP_REST_Request $request Full details about the request.
+	 * @return WP_Error|boolean
+	 */
+	public function get_items_permissions_check( $request ) {
+		if ( ! wc_rest_check_user_permissions( 'read' ) ) {
+			return new WP_Error( 'woocommerce_rest_cannot_view', __( 'Sorry, you cannot list resources.', 'woocommerce' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+
+		return true;
 	}
 }
 
