@@ -40,6 +40,9 @@ Keep in mind that you do need a Metorik account for it to work with, so if you d
 Yes, you do ([sign up here](https://metorik.com)). It will still work but will really not be of much use to you without one.
 
 == Changelog ==
+= 0.2.3 =
+* Show notice prompting users to go back to Metorik after installing to complete connection
+
 = 0.2.2 =
 * Fix customer IDs endpoint permissions
 
