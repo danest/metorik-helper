@@ -40,6 +40,12 @@ Keep in mind that you do need a Metorik account for it to work with, so if you d
 Yes, you do ([sign up here](https://metorik.com)). It will still work but will really not be of much use to you without one.
 
 == Changelog ==
+= 0.3.0 =
+* New endpoints for orders updated
+* New endpoints for customers updated
+* New endpoints for products updated
+* Fix customer IDs endpoint query for custom DB prefixes
+
 = 0.2.3 =
 * Show notice prompting users to go back to Metorik after installing to complete connection
 
