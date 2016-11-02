@@ -3,12 +3,37 @@
  * Plugin Name: Metorik Helper
  * Plugin URI: https://metorik.com
  * Description: Provides some fixes & extensions for WooCommerce, required by Metorik.
- * Version: 0.2.3
+ * Version: 0.3.0
  * Author: Metorik
  * Author URI: https://metorik.com
 */
 
 class Metorik_Helper {
+
+	/** 
+	 * Current version of Metorik.
+	 */
+	public $version = '0.3.0';
+
+	/**
+	 * The single instance of the class.
+	 */
+	protected static $_instance = null;
+
+	/**
+	 * Main Metorik Helper Instance.
+	 *
+	 * Ensures only one instance of the Metorik Helper is loaded or can be loaded.
+	 *
+	 * @return Metorik Helper - Main instance.
+	 */
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+
 	/**
 	 * Constructor.
 	 */
@@ -59,7 +84,15 @@ class Metorik_Helper {
 		}
 	}
 }
-new Metorik_Helper();
 
 // Notice after it's been activated
 register_activation_hook( __FILE__, array( 'Metorik_Helper', 'activate' ) );
+
+/**
+ * For plugin-wide access to initial instance.
+ */
+function Metorik_Helper() {
+	return Metorik_Helper::instance();
+} 
+
+Metorik_Helper();
