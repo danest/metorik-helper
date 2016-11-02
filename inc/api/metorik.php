@@ -76,6 +76,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller {
 		 */
 		$data = array(
 			'active' => true,
+			'version' => Metorik_Helper()->version,
 			'plugins' => $plugins,
 		);
 
