@@ -14,6 +14,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 	 */
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'customers_ids_route' ) );
+		add_action( 'rest_api_init', array( $this, 'customers_updated_route' ) );
 
 		// Temporarily override WC core customers/customer endpoints to fix bug that will be fixed in future WC release
 		// This only happens during imports
@@ -30,7 +31,18 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 	public function customers_ids_route() {
 		register_rest_route( $this->namespace, '/customers/ids/', array(
 			'methods' => WP_REST_Server::READABLE,
-			'callback' => array( $this, 'customers_ids_api_callback' ),
+			'callback' => array( $this, 'customers_ids_callback' ),
+			'permission_callback' => array( $this, 'get_items_permissions_check' ),
+		) );
+	}
+
+	/**
+	 * Customers updated route definition.
+	 */
+	public function customers_updated_route() {
+		register_rest_route( $this->namespace, '/customers/updated/', array(
+			'methods' => WP_REST_Server::READABLE,
+			'callback' => array( $this, 'customers_updated_callback' ),
 			'permission_callback' => array( $this, 'get_items_permissions_check' ),
 		) );
 	}
@@ -111,10 +123,12 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 
 	/**
 	 * Callback for the Customer IDs API endpoint.
+	 * Will likely be depreciated in a future version in favour of the customers updated endpoint.
+	 * When that happens, we'll likely need to group results by user ID.
 	 * 
 	 * @return WP_Error|array
 	 */
-	public function customers_ids_api_callback() {
+	public function customers_ids_callback() {
 		global $wpdb;
 
 		/**
@@ -123,7 +137,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		$customers = $wpdb->get_results(
 			"
 				SELECT user_id
-				FROM wp_usermeta
+				FROM $wpdb->usermeta
 				WHERE meta_key = 'wp_capabilities' 
 					AND meta_value LIKE '%customer%'
 			"
@@ -147,6 +161,57 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		$data = array(
 			'count' => count( $customers ),
 			'ids' => $customers,
+		);
+
+		/**
+		 * Response.
+		 */
+		$response = rest_ensure_response( $data );
+		$response->set_status( 200 );
+
+		return $response;
+	}
+
+	/**
+	 * Callback for the Customers updated API endpoint.
+	 * Later this will likely replace the IDs endpoint completely as it gets depreciated.
+	 */
+	public function customers_updated_callback( $request ) {
+		global $wpdb;
+
+		/**
+		 * Check days set and use default if not.
+		 */
+		$days = 30;
+		if (isset( $request['days'] ) ) {
+			$days = intval( $request['days'] );
+		}
+
+		// How many days back?
+		$time = strtotime( '- ' . $days . ' days' );
+
+		/**
+		 * Get customers where the last update is greater than x days ago.
+		 * The date needs to be a timestring.
+		 */
+		$customers = $wpdb->get_results( $wpdb->prepare(
+			"
+				SELECT 
+					user_id as id,
+					meta_value as last_updated
+				FROM $wpdb->usermeta
+				WHERE meta_key = 'last_update' 
+					AND meta_value > %d
+			", array(
+				$time
+			)
+		) );
+
+		/**
+		 * Prepare response.
+		 */
+		$data = array(
+			'customers' => $customers,
 		);
 
 		/**
