@@ -146,21 +146,26 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		/**
 		 * No customers.
 		 */
-		if (! $customers) {
+		if ( ! $customers || ! is_array( $customers ) ) {
 			return false;
 		}
 
 		/**
 		 * Just get IDs.
 		 */
-		$customers = array_map( 'current', $customers );
+		$ids = array();
+		foreach ( $customers as $customer ) {
+			if ( isset( $customer->user_id ) ) {
+				$ids[] = intval( $customer->user_id );
+			}
+		}
 
 		/**
 		 * Prepare response.
 		 */
 		$data = array(
-			'count' => count( $customers ),
-			'ids' => $customers,
+			'count' => count( $ids ),
+			'ids' => $ids,
 		);
 
 		/**
