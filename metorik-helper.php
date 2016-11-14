@@ -3,7 +3,7 @@
  * Plugin Name: Metorik Helper
  * Plugin URI: https://metorik.com
  * Description: Provides some fixes & extensions for WooCommerce, required by Metorik.
- * Version: 0.4.1
+ * Version: 0.4.2
  * Author: Metorik
  * Author URI: https://metorik.com
 */
@@ -13,7 +13,7 @@ class Metorik_Helper {
 	/** 
 	 * Current version of Metorik.
 	 */
-	public $version = '0.4.1';
+	public $version = '0.4.2';
 
 	/**
 	 * The single instance of the class.
@@ -67,9 +67,11 @@ class Metorik_Helper {
 	/**
 	 * Run on activation.
 	 */
-	public function activate() {
-		// Set Metorik's show activation notice option to true
-		update_option( 'metorik_show_activation_notice', true );
+	public static function activate() {
+		// Set Metorik's show activation notice option to true if it isn't already false (only first time)
+		if ( get_option( 'metorik_show_activation_notice', true ) ) { 
+			update_option( 'metorik_show_activation_notice', true );
+		}
 	}
 
 	/**
