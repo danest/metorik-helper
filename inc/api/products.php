@@ -94,6 +94,7 @@ class Metorik_Helper_API_Products extends WC_REST_Posts_Controller {
 
 		// How many days back?
 		$time = strtotime( '- ' . $days . ' days' );
+		$from = date( 'Y-m-d H:i:s', $time );
 
 		/**
 		 * Get products where the date modified is greater than x days ago.
