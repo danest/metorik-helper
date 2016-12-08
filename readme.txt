@@ -2,7 +2,7 @@
 Contributors: bryceadams, metorik
 Tags: woocommerce, metorik, woocommerce analytics, woocommerce metrics
 Requires at least: 4.4.0
-Tested up to: 4.6.1
+Tested up to: 4.7.0
 Stable tag: trunk
 License: MIT
 License URI: https://opensource.org/licenses/MIT
