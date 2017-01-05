@@ -16,6 +16,11 @@ class Metorik_Helper {
 	public $version = '0.5.0';
 
 	/**
+	 * URL dir for plugin.
+	 */
+	public $url;
+
+	/**
 	 * The single instance of the class.
 	 */
 	protected static $_instance = null;
@@ -39,6 +44,9 @@ class Metorik_Helper {
 	 */
 	public function __construct() {
 		add_action( 'plugins_loaded', array( $this, 'init' ) );
+
+		// Set URL
+		$this->url = plugin_dir_url( __FILE__ );
 	}
 
 	/**
@@ -52,6 +60,7 @@ class Metorik_Helper {
 			// Require files for the plugin
 			require_once( 'inc/import.php' );
 			require_once( 'inc/api.php' );
+			require_once( 'inc/ui.php' );
 		} else {
 			add_action( 'admin_notices', array( $this, 'no_wc' ) );
 		}
