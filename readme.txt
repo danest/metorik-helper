@@ -12,7 +12,7 @@ The Metorik Helper helps provide your WooCommerce store with powerful analytics,
 == Description ==
 The Metorik Helper helps [Metorik](https://metorik.com) connect and work better with your site. Simply install, activate and Metorik will take care of the rest!
 
-**Note:** This plugin is only really of use to you if you have a Metorik account/store. You can set one up for free and enjoy a 2 week trial, but keep in mind that it is currently a paid service.
+**Note:** This plugin is only really of use to you if you have a Metorik account/store. You can set one up for free and enjoy a 30 day trial, but keep in mind that it is a paid service.
 
 ---
 
@@ -39,9 +39,20 @@ Keep in mind that you do need a Metorik account for it to work with, so if you d
 
 Yes, you do ([sign up here](https://metorik.com)). It will still work but will really not be of much use to you without one.
 
+**Can I hide the Metorik links in my WordPress dashboard?**
+
+If you truly want to (but why! They're so handy), you can. Simply add:
+
+```
+add_filter( 'metorik_show_ui', '__return_false' );
+```
+
+To your theme's `functions.php` or a custom plugin.
+
 == Changelog ==
 = 0.5.0 =
 * Remove custom customer index/single endpoints if 2.7
+* Links from resource admin pages to Metorik
 
 = 0.4.2 =
 * Make activation method static
