@@ -50,6 +50,9 @@ add_filter( 'metorik_show_ui', '__return_false' );
 To your theme's `functions.php` or a custom plugin.
 
 == Changelog ==
+= 0.5.1 =
+* Fix undefined variable notice
+
 = 0.5.0 =
 * Remove custom customer index/single endpoints if 2.7
 * Links from resource admin pages to Metorik
