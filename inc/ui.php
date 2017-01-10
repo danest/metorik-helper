@@ -98,6 +98,7 @@ class Metorik_UI {
 	 */
 	public function admin_notices() {
 		$screen = get_current_screen()->base;
+		$links = false; // default
 
 		// reports
 		if ( $screen == 'woocommerce_page_wc-reports' ) {
