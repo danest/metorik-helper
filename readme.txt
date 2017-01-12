@@ -50,6 +50,9 @@ add_filter( 'metorik_show_ui', '__return_false' );
 To your theme's `functions.php` or a custom plugin.
 
 == Changelog ==
+= 0.5.2 =
+* Fix minor PHP notices in admin
+
 = 0.5.1 =
 * Fix undefined variable notice
 
