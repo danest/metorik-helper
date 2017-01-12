@@ -102,11 +102,11 @@ class Metorik_UI {
 
 		// reports
 		if ( $screen == 'woocommerce_page_wc-reports' ) {
-			$report = sanitize_text_field( $_GET['report'] );
-			$tab = sanitize_text_field( $_GET['tab'] );
+			$report = isset( $_GET['report'] ) ? sanitize_text_field( $_GET['report'] ) : false;
+			$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : false;
 
 			// no report set? check if root of this tab
-			if ( ! $report ) {
+			if ( ! $report && $tab ) {
 				switch ( $tab ) {
 					case 'orders':
 						$report = 'sales_by_date';
@@ -118,7 +118,7 @@ class Metorik_UI {
 			}
 
 			// no tab? sales
-			if ( ! isset( $GET['tab'] ) ) {
+			if ( ! $tab ) {
 				$report = 'sales_by_date';
 			}
 
@@ -180,25 +180,27 @@ class Metorik_UI {
 
 		// resources
 		if ( $screen == 'edit' ) {
-			$type = sanitize_text_field( $_GET['post_type'] );
+			$type = isset( $_GET['post_type'] ) ? sanitize_text_field( $_GET['post_type'] ) : false;
 
-			switch ( $type ) {
-				case 'shop_order':
-					$links = [
-						[
-							'report' => 'All Orders',
-							'link' => 'orders',
-						]
-					];
-					break;
-				case 'product':
-					$links = [
-						[
-							'report' => 'All Products',
-							'link' => 'products',
-						]
-					];
-					break;
+			if ( $type ) {
+				switch ( $type ) {
+					case 'shop_order':
+						$links = [
+							[
+								'report' => 'All Orders',
+								'link' => 'orders',
+							]
+						];
+						break;
+					case 'product':
+						$links = [
+							[
+								'report' => 'All Products',
+								'link' => 'products',
+							]
+						];
+						break;
+				}
 			}
 		}
 
@@ -213,8 +215,9 @@ class Metorik_UI {
 		}
 
 		if ( $screen == 'edit-tags' ) {
-			$tax = sanitize_text_field( $_GET['taxonomy'] );
-			$type = sanitize_text_field( $_GET['post_type'] );
+			$tax = isset( $_GET['taxonomy'] ) ? sanitize_text_field( $_GET['taxonomy'] ) : false;
+			$type = isset( $_GET['post_type'] ) ? sanitize_text_field( $_GET['post_type'] ) : false;
+			
 			if ( $tax == 'product_cat' && $type == 'product' ) {
 				$links = [
 					[
