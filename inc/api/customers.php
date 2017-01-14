@@ -15,6 +15,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'customers_ids_route' ) );
 		add_action( 'rest_api_init', array( $this, 'customers_updated_route' ) );
+		add_action( 'rest_api_init', array( $this, 'customers_roles_route' ) );
 
 		// Temporarily override WC core customers/customer endpoints to fix bug with customer last order
 		// Don't need to do in 2.7 as just total spent / order count and we d that with meta filter
@@ -44,6 +45,17 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		register_rest_route( $this->namespace, '/customers/updated/', array(
 			'methods' => WP_REST_Server::READABLE,
 			'callback' => array( $this, 'customers_updated_callback' ),
+			'permission_callback' => array( $this, 'get_items_permissions_check' ),
+		) );
+	}
+
+	/**
+	 * Customers roles route definition.
+	 */
+	public function customers_roles_route() {
+		register_rest_route( $this->namespace, '/customers/roles/', array(
+			'methods' => WP_REST_Server::READABLE,
+			'callback' => array( $this, 'customers_roles_callback' ),
 			'permission_callback' => array( $this, 'get_items_permissions_check' ),
 		) );
 	}
@@ -218,6 +230,38 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		 */
 		$data = array(
 			'customers' => $customers,
+		);
+
+		/**
+		 * Response.
+		 */
+		$response = rest_ensure_response( $data );
+		$response->set_status( 200 );
+
+		return $response;
+	}
+
+	/**
+	 * Callback for the Customers roles API endpoint.
+	 */
+	public function customers_roles_callback( $request ) {
+		// we need this to use the get_editable_roles() function
+		require get_home_path() . '/wp-admin/includes/user.php';
+
+		/**
+		 * Format roles (we don't need all caps).
+		 */
+		$editable_roles = get_editable_roles();
+		$roles = array();
+		foreach( $editable_roles as $key => $editable_role ) {
+			$roles[$key] = $editable_role['name'];
+		}
+
+		/**
+		 * Prepare response.
+		 */
+		$data = array(
+			'roles' => $roles,
 		);
 
 		/**
