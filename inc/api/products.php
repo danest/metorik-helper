@@ -107,6 +107,7 @@ class Metorik_Helper_API_Products extends WC_REST_Posts_Controller {
 				FROM $wpdb->posts
 				WHERE post_type = 'product' 
 					AND post_modified_gmt > %s
+					AND post_status != 'trash'
 			", array(
 				$from
 			)
