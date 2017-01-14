@@ -49,7 +49,23 @@ add_filter( 'metorik_show_ui', '__return_false' );
 
 To your theme's `functions.php` or a custom plugin.
 
+The other option is to simply 'dimiss' a Metorik notice and they will no longer appear.
+
+To hide the links from individual orders/products, you can click the 'Screen Options' tab at the top of the page and uncheck the Metorik option.
+
+**I accidentally hid the notices. How can I get them back?**
+
+We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
+
 == Changelog ==
+= 0.6.0 =
+* Track and store customer/order referer (source)
+* Endpoint for possible order statuses
+* Endpoint for possible customer (user) roles
+* Ignore trashed orders/products in updated endpoints
+* Allow dismissing/hiding of the Metorik notices
+* PHP 5.2 compat fix
+
 = 0.5.2 =
 * Fix minor PHP notices in admin
 
