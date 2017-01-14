@@ -16,6 +16,7 @@ class Metorik_UI {
 			add_filter( 'manage_users_custom_column', array( $this, 'add_user_table_column' ), 10, 3 );
 
 			// admin notices (for reports)
+			add_action( 'admin_init', array( $this, 'check_admin_notices_dismiss' ) );
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 		}
 	}
@@ -42,6 +43,9 @@ class Metorik_UI {
 				#' . $id . ' .inside a span { float: right; }
 			';
 		}
+
+		echo '.metorik-notice.notice button.notice-dismiss { display: none; }';
+		echo '.metorik-notice.notice a.notice-dismiss { text-decoration: none; }';
 
 		echo '</style>';
 	}
@@ -94,150 +98,177 @@ class Metorik_UI {
 	}
 
 	/**
+	 * Check if admin notices should be dismissed.
+	 */
+	public function check_admin_notices_dismiss() {
+		if ( isset( $_GET['dismiss-metorik-notices'] ) && check_admin_referer( 'dismiss-metorik-notices' ) ) {
+			update_option( 'metorik_show_notices', 'no' );
+		}
+
+		if ( isset( $_GET['show-metorik-notices'] ) && is_user_logged_in() && current_user_can( 'administrator' ) ) {
+			update_option( 'metorik_show_notices', 'yes' );
+		}
+	}
+
+	/**
 	 * Admin notices.
 	 */
 	public function admin_notices() {
 		$screen = get_current_screen()->base;
 		$links = false; // default
+		$show_notices = get_option( 'metorik_show_notices', 'yes' );
 
-		// reports
-		if ( $screen == 'woocommerce_page_wc-reports' ) {
-			$report = isset( $_GET['report'] ) ? sanitize_text_field( $_GET['report'] ) : false;
-			$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : false;
+		// check if they've been disabled
+		if ( $show_notices == 'yes' ) {
+			// reports
+			if ( $screen == 'woocommerce_page_wc-reports' ) {
+				$report = isset( $_GET['report'] ) ? sanitize_text_field( $_GET['report'] ) : false;
+				$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : false;
 
-			// no report set? check if root of this tab
-			if ( ! $report && $tab ) {
-				switch ( $tab ) {
-					case 'orders':
-						$report = 'sales_by_date';
-						break;
-					case 'customers':
-						$report = 'customers';
-						break;
+				// no report set? check if root of this tab
+				if ( ! $report && $tab ) {
+					switch ( $tab ) {
+						case 'orders':
+							$report = 'sales_by_date';
+							break;
+						case 'customers':
+							$report = 'customers';
+							break;
+					}
 				}
-			}
 
-			// no tab? sales
-			if ( ! $tab ) {
-				$report = 'sales_by_date';
-			}
+				// no tab? sales
+				if ( ! $tab ) {
+					$report = 'sales_by_date';
+				}
 
-			switch ( $report ) {
-				case 'sales_by_date':
-					$links = [
-						[
-							'report' => 'Sales Report',
-							'link' => 'reports/orders',
-						],
-						[
-							'report' => 'Refunds Report',
-							'link' => 'reports/refunds',
-						],
-					];
-					break;
-				case 'sales_by_product':
-					$links = [
-						[
-							'report' => 'All Products',
-							'link' => 'products',
-						],
-						[
-							'report' => 'Compare Products',
-							'link' => 'reports/products',
-						],
-					];
-					break;
-				case 'sales_by_category':
-					$links = [
-						[
-							'report' => 'All Categories',
-							'link' => 'categories',
-						],
-					];
-					break;
-				case 'customers':
-					$links = [
-						[
-							'report' => 'Customers Report',
-							'link' => 'reports/customers',
-						],
-						[
-							'report' => 'Customer Retention',
-							'link' => 'reports/customer-retention',
-						],
-					];
-					break;
-				case 'customer_list':
-					$links = [
-						[
-							'report' => 'All Customers',
-							'link' => 'customers',
-						],
-					];
-					break;
-			}
-		}
-
-		// resources
-		if ( $screen == 'edit' ) {
-			$type = isset( $_GET['post_type'] ) ? sanitize_text_field( $_GET['post_type'] ) : false;
-
-			if ( $type ) {
-				switch ( $type ) {
-					case 'shop_order':
-						$links = [
-							[
-								'report' => 'All Orders',
-								'link' => 'orders',
-							]
-						];
+				switch ( $report ) {
+					case 'sales_by_date':
+						$links = array(
+							array(
+								'report' => 'Sales Report',
+								'link' => 'reports/orders',
+							),
+							array(
+								'report' => 'Refunds Report',
+								'link' => 'reports/refunds',
+							),
+						);
 						break;
-					case 'product':
-						$links = [
-							[
+					case 'sales_by_product':
+						$links = array(
+							array(
 								'report' => 'All Products',
 								'link' => 'products',
-							]
-						];
+							),
+							array(
+								'report' => 'Compare Products',
+								'link' => 'reports/products',
+							),
+						);
+						break;
+					case 'sales_by_category':
+						$links = array(
+							array(
+								'report' => 'All Categories',
+								'link' => 'categories',
+							),
+						);
+						break;
+					case 'customers':
+						$links = array(
+							array(
+								'report' => 'Customers Report',
+								'link' => 'reports/customers',
+							),
+							array(
+								'report' => 'Customer Retention',
+								'link' => 'reports/customer-retention',
+							),
+						);
+						break;
+					case 'customer_list':
+						$links = array(
+							array(
+								'report' => 'All Customers',
+								'link' => 'customers',
+							),
+						);
 						break;
 				}
 			}
-		}
 
-		// users
-		if ( $screen == 'users' ) {
-			$links = [
-				[
-					'report' => 'All Customers',
-					'link' => 'customers',
-				]
-			];
-		}
+			// resources
+			if ( $screen == 'edit' ) {
+				$type = isset( $_GET['post_type'] ) ? sanitize_text_field( $_GET['post_type'] ) : false;
 
-		if ( $screen == 'edit-tags' ) {
-			$tax = isset( $_GET['taxonomy'] ) ? sanitize_text_field( $_GET['taxonomy'] ) : false;
-			$type = isset( $_GET['post_type'] ) ? sanitize_text_field( $_GET['post_type'] ) : false;
-			
-			if ( $tax == 'product_cat' && $type == 'product' ) {
-				$links = [
-					[
-						'report' => 'All Categories',
-						'link' => 'categories',
-					],
-				];
-			}
-		}
-
-		// output notice if have links
-		if ( $links ) {
-			echo '<div class="updated"><p>You can view a more detailed, powerful, and accurate version of this on Metorik: ';
-			foreach ( $links as $key => $link ) {
-				echo '<a href="https://app.metorik.com/' . $link['link'] . '">' . $link['report'] . '</a>';
-				if ( $key + 1 < count( $links ) ) {
-					echo ' & ';
+				if ( $type ) {
+					switch ( $type ) {
+						case 'shop_order':
+							$links = array(
+								array(
+									'report' => 'All Orders',
+									'link' => 'orders',
+								)
+							);
+							break;
+						case 'product':
+							$links = array(
+								array(
+									'report' => 'All Products',
+									'link' => 'products',
+								)
+							);
+							break;
+					}
 				}
 			}
-			echo '</p></div>';
+
+			// users
+			if ( $screen == 'users' ) {
+				$links = array(
+					array(
+						'report' => 'All Customers',
+						'link' => 'customers',
+					)
+				);
+			}
+
+			if ( $screen == 'edit-tags' ) {
+				$tax = isset( $_GET['taxonomy'] ) ? sanitize_text_field( $_GET['taxonomy'] ) : false;
+				$type = isset( $_GET['post_type'] ) ? sanitize_text_field( $_GET['post_type'] ) : false;
+				
+				if ( $tax == 'product_cat' && $type == 'product' ) {
+					$links = array(
+						array(
+							'report' => 'All Categories',
+							'link' => 'categories',
+						),
+					);
+				}
+			}
+
+			// output notice if have links
+			if ( $links ) {
+				echo '<div class="metorik-notice notice notice-info is-dismissible">';
+					// notice message
+					echo '<p>You can view a more detailed, powerful, and accurate version of this on Metorik: ';
+					foreach ( $links as $key => $link ) {
+						echo '<a href="https://app.metorik.com/' . $link['link'] . '">' . $link['report'] . '</a>';
+						if ( $key + 1 < count( $links ) ) {
+							echo ' & ';
+						}
+					}
+					echo '</p>';
+
+					// dismiss url and link
+					global $wp;
+					$current_url = add_query_arg( $wp->query_string, '', home_url( $wp->request ) );
+					$dismiss_url = add_query_arg( 'dismiss-metorik-notices', 'yes', $current_url );
+					$dismiss_url = wp_nonce_url( $dismiss_url, 'dismiss-metorik-notices' );
+					echo '<a href="' . esc_url( $dismiss_url ) . '" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></a>';
+				echo '</div>';
+			}
 		}
 	}
 }
