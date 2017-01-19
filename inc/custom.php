@@ -15,9 +15,9 @@ class Metorik_Custom {
 	 * are a bit unreliable and cookie here is easier.
 	 */
 	public function set_referer() {
-		if (! is_admin() ) {
-			// check if none in cookie already
-			if (! isset( $_COOKIE['metorik_http_referer'] ) ) {
+		if ( ! is_admin() ) {
+			// check if none in cookie already and http referer is set
+			if ( ! isset( $_COOKIE['metorik_http_referer'] ) && isset( $_SERVER['HTTP_REFERER'] ) ) {
 				// get referer
 				$referer = sanitize_text_field( $_SERVER['HTTP_REFERER'] );
 
