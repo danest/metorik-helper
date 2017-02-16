@@ -60,6 +60,8 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 == Changelog ==
 = 0.7.0 =
 * Include order post meta data when pre WC 2.7
+* Subscriptions endpoints
+* Open Metorik links in new tabs
 
 = 0.6.1 =
 * Fix notices for unset http referer
