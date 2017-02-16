@@ -62,7 +62,7 @@ class Metorik_UI {
 	 * Product meta box display callback.
 	 */
 	public function product_box_display( $post ) {
-		echo '<a href="https://app.metorik.com/product/' . $post->ID . '">
+		echo '<a href="https://app.metorik.com/product/' . $post->ID . '" target="_blank">
 			<img src="' . Metorik_Helper()->url . 'assets/img/metorik.png" /> View on Metorik <span class="dashicons dashicons-arrow-right-alt2"></span>
 		</a>';
 	}
@@ -71,7 +71,7 @@ class Metorik_UI {
 	 * Order meta box display callback.
 	 */
 	public function order_box_display( $post ) {
-		echo '<a href="https://app.metorik.com/order/' . $post->ID . '">
+		echo '<a href="https://app.metorik.com/order/' . $post->ID . '" target="_blank">
 			<img src="' . Metorik_Helper()->url . 'assets/img/metorik.png" /> View on Metorik <span class="dashicons dashicons-arrow-right-alt2"></span>
 		</a>';
 	}
@@ -90,7 +90,7 @@ class Metorik_UI {
 	public function add_user_table_column( $val, $column_name, $user_id ) {
 		switch ($column_name) {
 			case 'metorik' :
-				return '<a href="https://app.metorik.com/customer/' . $user_id . '">View</a>';
+				return '<a href="https://app.metorik.com/customer/' . $user_id . '" target="_blank">View</a>';
 				break;
 			default:
 		}
@@ -254,7 +254,7 @@ class Metorik_UI {
 					// notice message
 					echo '<p>You can view a more detailed, powerful, and accurate version of this on Metorik: ';
 					foreach ( $links as $key => $link ) {
-						echo '<a href="https://app.metorik.com/' . $link['link'] . '">' . $link['report'] . '</a>';
+						echo '<a href="https://app.metorik.com/' . $link['link'] . '" target="_blank">' . $link['report'] . '</a>';
 						if ( $key + 1 < count( $links ) ) {
 							echo ' & ';
 						}
