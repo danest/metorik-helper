@@ -103,10 +103,10 @@ class Metorik_Helper_API_Products extends WC_REST_Posts_Controller {
 			"
 				SELECT 
 					id,
-					UNIX_TIMESTAMP(post_modified_gmt) as last_updated
+					UNIX_TIMESTAMP(post_modified) as last_updated
 				FROM $wpdb->posts
 				WHERE post_type = 'product' 
-					AND post_modified_gmt > %s
+					AND post_modified > %s
 					AND post_status != 'trash'
 			", array(
 				$from

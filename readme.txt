@@ -62,6 +62,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 * Include order post meta data when pre WC 2.7
 * Subscriptions endpoints
 * Open Metorik links in new tabs
+* Fix updated timezone issue
 
 = 0.6.1 =
 * Fix notices for unset http referer
