@@ -23,6 +23,7 @@ class Metorik_Helper_API {
 		require_once( 'api/subscriptions.php' );
 		require_once( 'api/refunds.php' );
 		require_once( 'api/metorik.php' );
+		require_once( 'api/metorik-v2.php' );
 	}
 }
 
