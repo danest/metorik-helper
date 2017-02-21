@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Orders API for Metorik.
+ * Metorik's extension of the WC API - version 2.
  */
 class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller {
 	public $namespace = 'wc/v1';
