@@ -2,7 +2,7 @@
 Contributors: bryceadams, metorik
 Tags: woocommerce, metorik, woocommerce analytics, woocommerce metrics
 Requires at least: 4.4.0
-Tested up to: 4.7.2
+Tested up to: 4.7.0
 Stable tag: trunk
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -58,9 +58,6 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
-= 0.7.1 =
-* WooCommerce 2.7 fixes
-
 = 0.7.0 =
 * Include order post meta data when pre WC 2.7
 * Subscriptions endpoints
