@@ -103,7 +103,7 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller {
 			"
 				SELECT 
 					id,
-					UNIX_TIMESTAMP(post_modified) as last_updated
+					UNIX_TIMESTAMP(CONVERT_TZ(post_modified_gmt, '+00:00', @@session.time_zone)) as last_updated
 				FROM $wpdb->posts
 				WHERE post_type = 'shop_subscription' 
 					AND post_modified > %s
