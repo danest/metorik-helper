@@ -4,6 +4,8 @@
  * Custom changes that Metorik implements, like tracking referer.
  */
 class Metorik_Custom {
+	public $possibleUtms = array( 'utm_source', 'utm_medium', 'utm_campaign' );
+
 	public function __construct() {
 		add_action( 'init', array( $this, 'set_referer' ) );
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'set_order_referer' ) );
@@ -30,6 +32,18 @@ class Metorik_Custom {
 				$time = apply_filters( 'metorik_referer_cookie_time', 3600 );
 				setcookie( 'metorik_http_referer', $referer, time() + $time );
 			}
+
+			// set UTM tags if there are any
+			if ( isset( $_GET['utm_source'] ) || isset( $_GET['utm_medium']  )|| isset( $_GET['utm_campaign'] ) ) {
+				$time = apply_filters( 'metorik_utm_cookie_time', 3600 );
+				
+				foreach ( $this->possibleUtms as $possible ) {
+					if ( isset( $_GET[$possible] ) && $_GET[$possible] ) {
+						$value = sanitize_text_field( $_GET[$possible] );
+						setcookie( 'metorik_' . $possible, $value, time() + $time );
+					}
+				}
+			}
 		}
 	}
 
@@ -39,8 +53,16 @@ class Metorik_Custom {
 	public function set_order_referer( $order_id ) {
 		// if we have a referer, get it and set in order meta
 		if ( isset( $_COOKIE['metorik_http_referer'] ) ) {
-			$referer = sanitize_text_field( $_COOKIE['metorik_http_referer'] );
+			$referer = apply_filters( 'metorik_order_referer', sanitize_text_field( $_COOKIE['metorik_http_referer'] ) );
 			update_post_meta( $order_id, '_metorik_referer', $referer );
+		}
+
+		// If we have any UTM tags, set them
+		foreach ( $this->possibleUtms as $utm ) {
+			if ( isset( $_COOKIE['metorik_' . $utm] ) ) {
+				$value = sanitize_text_field( $_COOKIE['metorik_' . $utm] );
+				update_post_meta( $order_id, '_metorik_' . $utm, $value );
+			}
 		}
 	}
 
@@ -50,8 +72,16 @@ class Metorik_Custom {
 	public function set_customer_referer( $user_id ) {
 		// if we have a referer, get it and set in order meta
 		if ( isset( $_COOKIE['metorik_http_referer'] ) ) {
-			$referer = sanitize_text_field( $_COOKIE['metorik_http_referer'] );
+			$referer = apply_filters( 'metorik_customer_referer', sanitize_text_field( $_COOKIE['metorik_http_referer'] ) );
 			update_user_meta( $user_id, '_metorik_referer', $referer );
+		}
+
+		// If we have any UTM tags, set them
+		foreach ( $this->possibleUtms as $utm ) {
+			if ( isset( $_COOKIE['metorik_' . $utm] ) ) {
+				$value = sanitize_text_field( $_COOKIE['metorik_' . $utm] );
+				update_user_meta( $user_id, '_metorik_' . $utm, $value );
+			}
 		}
 	}
 }
