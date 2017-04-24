@@ -29,13 +29,13 @@ class Metorik_Custom {
 				}
 
 				// store in cookie (sessions not reliable enough)
-				$time = apply_filters( 'metorik_referer_cookie_time', 3600 );
+				$time = apply_filters( 'metorik_referer_cookie_time', 3600 * 24 * 180 ); // 180 days
 				setcookie( 'metorik_http_referer', $referer, time() + $time );
 			}
 
 			// set UTM tags if there are any
 			if ( isset( $_GET['utm_source'] ) || isset( $_GET['utm_medium']  )|| isset( $_GET['utm_campaign'] ) ) {
-				$time = apply_filters( 'metorik_utm_cookie_time', 3600 );
+				$time = apply_filters( 'metorik_utm_cookie_time', 3600 * 24 * 180 ); // 180 days
 				
 				foreach ( $this->possibleUtms as $possible ) {
 					if ( isset( $_GET[$possible] ) && $_GET[$possible] ) {
