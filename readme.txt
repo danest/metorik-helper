@@ -58,6 +58,9 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
+= 0.9.0 =
+* Coupon endpoints
+
 = 0.8.1 =
 * Extend source & UTM cookie storing time to 6 months
 
