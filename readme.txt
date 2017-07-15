@@ -1,43 +1,91 @@
 === Metorik Helper ===
 Contributors: bryceadams, metorik
-Tags: woocommerce, metorik, woocommerce analytics, woocommerce metrics
+Tags: woocommerce, metorik, woocommerce analytics, woocommerce reports, woo reports, woocommerce filtering, woocommerce google analytics, woocommerce zendesk, woocommerce help scout, woocommerce freshdesk, woocommerce support, subscription reports
 Requires at least: 4.4.0
 Tested up to: 4.8.0
 Stable tag: trunk
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-The Metorik Helper helps provide your WooCommerce store with powerful analytics, reports, and insights.
+The Metorik Helper helps provide your WooCommerce store with powerful analytics, reports, and tools.
 
 == Description ==
-The Metorik Helper helps [Metorik](https://metorik.com) connect and work better with your site. Simply install, activate and Metorik will take care of the rest!
 
-**Note:** This plugin is only really of use to you if you have a Metorik account/store. You can set one up for free and enjoy a 30 day trial, but keep in mind that it is a paid service.
+> **Note:** This plugin is only really of use to you if you have a Metorik account/store. You can set one up for free and enjoy a 30 day trial, but keep in mind that it is a paid service. [**Try Metorik for free!**](https://metorik.com?ref=wporg)
+
+In just a few clicks, Metorik gives your store a powerful real-time dashboard, unifying your store's orders, customers, and products, helping you understand your data and make more informed decisions every day.
+
+= Blazing fast =
+
+Tired of spending half your day waiting for WooCommerce reports to load? Metorik spins up detailed reports and charts faster than any other tool available. It also reduces the load on your site's admin dashboard since you can do everything from Metorik, as such making your site faster.
+
+= Every KPI you could ask for =
+
+What's your average customer LTV (lifetime value)? What's your average numbers of items per order? How many of product A or variation B did you sell last month? If these are questions you've always wanted answers for, Metorik will be a lifesaver.
+
+= Filter everything by anything =
+
+Metorik offers a robust & powerful filter system. It allows you segment your data by anything and everything (seriously), export that segmented data to a CSV (automatically, if that's your thing). You can even save the filters you used for next time, or share them with your team.
+
+Want all customers who have an LTV over $100 and own a certain product? **Easy.**
+
+Orders that were made last month where 2 items were purchased and the customer was from the UK? **Easy.**
+
+Subscriptions that were set to be canceled this week? **Easy.**
+
+Customers who haven't ordered in 4 months and live in California? **Easy.**
+
+Read more about the filter system [here](https://metorik.com/blog/improved-segmenting-filtering-in-metorik?ref=wporg).
+
+= Customer service integrations =
+
+Metorik integrates with your existing support system to show customer data right alongside support tickets. Data like their contact information, lifetime value, order history, products purchased and more, instantly at you and your customer service teams' fingertips. Additionally, you'll find data from your support systems shown on order pages and customer profiles in Metorik.
+
+Integrations are currently available for [Zendesk](https://metorik.com/blog/connecting-zendesk-and-woocommerce?ref=wporg), Help Scout, Freshdesk, and Intercom, with more to come.
+
+= Google Analytics integration =
+
+Connect your Google Analytics account to Metorik and get access to stats like conversion rates instantly. Better yet, you can get **historical conversion rates!** [Read more about it here](https://metorik.com/blog/conversation-rates-for-woocommerce-with-google-analytics?ref=wporg).
+
+= Email + Slack reports =
+
+Automatically receive reports summarising your store's activity as often as you'd like. They can be sent by both Email & Slack, and include your KPIs, charts, best sellers, and more.
+
+= One-off and automated exports =
+
+Any data can be exported from Metorik at any time in minutes. You can even schedule exports to happen automatically as often as you'd like.
+
+*Bonus:* These exports have zero-impact on your site whatsoever. No more server downtime!
+
+= WooCommerce Subscriptions support =
+
+Metorik integrates seamlessly with [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions?ref=66), offering subscription filtering & exporting, along with reports like MRR, Churn, Retention, Forecasting, and more. You can even have an automated subscriptions report sent to you every day summarising everything subscriptions-related.
+
+= Live chat support =
+
+Support is available through live chat to every Metorik user. Metorik's founder - [Bryce](https://twitter.com/bryceadams) - will personally work with you to ensure you and your team get the most out of Metorik.
+
+= Bring your team =
+
+Whether you're running a store solo or bringing your team, Metorik has your back through its team system. Each store can have **unlimited team members** at no extra cost, each with their own role & permissions. No more sharing sales reports with your support reps and no more analytics modifying orders by accident.
+
+= More? =
+
+Oh, there's so much more. Seriously. Just have a look around the [Metorik website](https://metorik.com?ref=66) to get an idea of how valuable Metorik will be for your store.
 
 ---
 
-**What is Metorik?** Metorik is a service that provides detailed and powerful analytics for WooCommerce stores, and includes features like:
-
-* Growth rates
-* Customer profiles
-* Product insights
-* Interactive charts
-* Filtered exporting
-* Automated reports sent to you
-* Real-time analytics
-* Live KPI calculations
-* Blazing fast
-* Unlimited team members
+The Metorik Helper helps [Metorik](https://metorik.com?ref=wporg) connect and work better with your site. Simply install, activate and Metorik will take care of the rest!
 
 == Installation ==
 Install, activate and leave it to do the rest.
 
-Keep in mind that you do need a Metorik account for it to work with, so if you don't yet have a store set up in Metorik, head to [Metorik](https://metorik.com) and sign up now.
+Keep in mind that you do need a Metorik account for it to work with, so if you don't yet have a store set up in Metorik, head to [Metorik](https://metorik.com?ref=wporg) and sign up now.
 
 == Frequently Asked Questions ==
 **Do I need a Metorik account to use this plugin?**
 
-Yes, you do ([sign up here](https://metorik.com)). It will still work but will really not be of much use to you without one.
+Yes, you do ([sign up here](https://metorik.com?ref=wporg)). It will still work but will really not be of much use to you without one.
 
 **Can I hide the Metorik links in my WordPress dashboard?**
 
