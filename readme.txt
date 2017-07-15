@@ -71,7 +71,7 @@ Whether you're running a store solo or bringing your team, Metorik has your back
 
 = More? =
 
-Oh, there's so much more. Seriously. Just have a look around the [Metorik website](https://metorik.com?ref=66) to get an idea of how valuable Metorik will be for your store.
+Oh, there's so much more. Seriously. Just have a look around the [Metorik website](https://metorik.com?ref=wporg) to get an idea of how valuable Metorik will be for your store.
 
 ---
 
