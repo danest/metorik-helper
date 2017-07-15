@@ -1,6 +1,6 @@
 === Metorik Helper ===
 Contributors: bryceadams, metorik
-Tags: woocommerce, metorik, woocommerce analytics, woocommerce reports, woo reports, woocommerce filtering, woocommerce google analytics, woocommerce zendesk, woocommerce help scout, woocommerce freshdesk, woocommerce support, subscription reports
+Tags: woocommerce, woocommerce analytics, woocommerce reports, woocommerce filtering, woocommerce google analytics, woocommerce zendesk, woocommerce help scout, woocommerce freshdesk, woocommerce support, subscription reports, woo reports
 Requires at least: 4.4.0
 Tested up to: 4.8.0
 Stable tag: trunk
