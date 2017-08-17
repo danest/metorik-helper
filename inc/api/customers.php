@@ -221,6 +221,18 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 			$time = $time - ( 60 * 60 * $hours );
 		}
 
+		// limit/offset
+		$limit = 200000;
+		$offset = 0;
+
+		if ( isset( $request['limit'] ) ) {
+			$limit = intval( $request['limit'] );
+		}
+
+		if ( isset( $request['offset'] ) ) {
+			$offset = intval( $request['offset'] );
+		}
+
 		/**
 		 * Get customers where the last update is greater than x days ago.
 		 * The date needs to be a timestring.
@@ -233,8 +245,11 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 				FROM $wpdb->usermeta
 				WHERE meta_key = 'last_update' 
 					AND meta_value > %d
+				LIMIT %d, %d
 			", array(
-				$time
+				$time,
+				$offset,
+				$limit
 			)
 		) );
 

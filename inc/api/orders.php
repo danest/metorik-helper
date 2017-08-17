@@ -128,6 +128,18 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller {
 		// format 'from date'
 		$from = date( 'Y-m-d H:i:s', $time );
 
+		// limit/offset
+		$limit = 200000;
+		$offset = 0;
+
+		if ( isset( $request['limit'] ) ) {
+			$limit = intval( $request['limit'] );
+		}
+
+		if ( isset( $request['offset'] ) ) {
+			$offset = intval( $request['offset'] );
+		}
+
 		/**
 		 * Get orders where the date modified is greater than x days ago and not trashed.
 		 */
@@ -140,8 +152,11 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller {
 				WHERE post_type = 'shop_order' 
 					AND post_modified > %s
 					AND post_status != 'trash'
+				LIMIT %d, %d
 			", array(
-				$from
+				$from,
+				$offset,
+				$limit
 			)
 		) );
 

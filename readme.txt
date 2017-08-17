@@ -111,6 +111,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 * Improve UTM tracking
 * Set tracking data in user meta during checkout
 * Added an 'hours' arg to updated endpoints
+* Added pagination to updated endpoints
 
 = 0.9.0 =
 * Coupon endpoints
