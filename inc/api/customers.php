@@ -201,12 +201,25 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		 * Check days set and use default if not.
 		 */
 		$days = 30;
-		if (isset( $request['days'] ) ) {
+		if ( isset( $request['days'] ) ) {
 			$days = intval( $request['days'] );
+		}
+
+		/**
+		 * Check hours set and use default if not.
+		 */
+		$hours = 0;
+		if ( isset( $request['hours'] ) ) {
+			$hours = intval( $request['hours'] );
 		}
 
 		// How many days back?
 		$time = strtotime( '- ' . $days . ' days' );
+
+		// if have hours, subtract
+		if ( $hours ) {
+			$time = $time - ( 60 * 60 * $hours );
+		}
 
 		/**
 		 * Get customers where the last update is greater than x days ago.
