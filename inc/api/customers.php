@@ -17,9 +17,13 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		add_action( 'rest_api_init', array( $this, 'customers_updated_route' ) );
 		add_action( 'rest_api_init', array( $this, 'customers_roles_route' ) );
 
-		// Temporarily override WC core customers/customer endpoints to fix bug with customer last order
-		// Don't need to do in 2.7 as just total spent / order count and we do that with meta filter
-		// This only happens during imports & for 2.6
+		/**
+		 * Temporarily override WC core customers/customer endpoints to fix bug with customer last order
+		 * Don't need to do in 2.7+ as just total spent / order count and we do that with meta filter
+		 * This only happens during imports & for 2.6.
+		 * 
+		 * Will be depreciated and removed in the near future.
+		 */
 		if ( get_option( 'metorik_importing_currently', false ) && version_compare( WC()->version, '2.7.0', '<' ) ) {
 			$this->WC_REST_Customers_Controller = new WC_REST_Customers_Controller();
 			add_action( 'rest_api_init', array( $this, 'customers_route' ) );

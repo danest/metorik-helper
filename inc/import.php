@@ -5,33 +5,50 @@
  */
 class Metorik_Import_Helpers {
 	public function __construct() {
-		// Only if the metorik_importing_currently is set (through API)
-		if ( get_option( 'metorik_importing_currently', false ) ) {
-			add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
-		}
+		add_filter( 'woocommerce_rest_prepare_customer', array( $this, 'filter_prepare_customer' ), 10, 3);
 	}
 
 	/**
-	 * Filter user meta for total spent + order count so that if
-	 * it's not yet set, get_user_meta will return 0.
+	 * Filter Woo's API prepare customer so we can filter customer
+	 * meta data if it's Metorik making an API request.
+	 */
+	public function filter_prepare_customer( $response, $user_data, $request ) {
+		// get request headers
+		$headers = $request->get_headers();
+
+		// check we have headers and user agent set and string,
+		if ( 
+			$headers && 
+			isset( $headers['user_agent'] ) && 
+			isset( $headers['user_agent'][0] ) &&
+			is_string( $headers['user_agent'][0] )
+		) {
+			// get user agent
+			$user_agent = strtolower( $headers['user_agent'][0] );
+
+			// if user agent has metorik in it, filter user meta to stop total spend/order count calculations
+			if ( strpos( $user_agent, 'metorik' ) !== false ) {
+				add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
+			}
+		}
+
+		// or as a backup method - check if no spend data param is set
+		if ( $request->get_param( 'no_spend_data' ) ) {
+			add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
+		}
+
+		// regardless, return response
+		return $response;
+	}
+
+	/**
+	 * Filter user meta for total spent + order count so that
+	 * if it's not yet set, get_user_meta will return 0.
 	 * This is so WC doesn't attempt to calculate it
-	 * while Metorik is doing the customers import.
-	 *
-	 * Of course, this does mess with WC's reporting and API when it comes
-	 * to returning a customer's total spent / order count, but if
-	 * you're using Metorik, you have no need for that.
-	 *
-	 * However, the option for metorik_importing_currently needs to be true
-	 * in order for this override to happen, and that's enabled/disabled
-	 * by the Metorik API, so it's not a huge concern.
-	 *
-	 * Note that while we could just remove the order count / total spent
-	 * from the customers.php class where we override the customers API
-	 * endpoints to fix the last order speed issue, that is a temp.
-	 * fix while the last order data is still being returned by
-	 * WC - so we'll remove our overriding later but still
-	 * need to have this code here stopping money spent
-	 * and order count from being calculated by WC.
+	 * while Metorik is doing customer queries.
+	 * 
+	 * This is called when Metorik is making a customer-related API
+	 * request to the store (determined by user agent/query param).
 	 */
 	public function filter_user_metadata( $value, $object_id, $meta_key, $single ) {
 		// Check if it's one of the keys we want to filter

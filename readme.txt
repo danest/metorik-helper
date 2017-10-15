@@ -106,6 +106,9 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
+= 0.11.0 =
+* Change method for stopping customer spend calculations in API so it just does it for Metorik API requests instead of on a time-basis by option.
+
 = 0.10.0 =
 * Track 'Engage' data
 * Improve UTM tracking
