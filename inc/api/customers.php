@@ -240,22 +240,53 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		/**
 		 * Get customers where the last update is greater than x days ago.
 		 * The date needs to be a timestring.
+		 *
+		 * Different query depending on if this is multisite or snot.
 		 */
-		$customers = $wpdb->get_results( $wpdb->prepare(
-			"
-				SELECT 
-					user_id as id,
-					meta_value as last_updated
-				FROM $wpdb->usermeta
-				WHERE meta_key = 'last_update' 
-					AND meta_value > %d
-				LIMIT %d, %d
-			", array(
-				$time,
-				$offset,
-				$limit
-			)
-		) );
+		
+		// Multisite
+		if ( is_multisite() ) {
+			// Cap column - prefix includes site ID
+			$cap_column = $wpdb->prefix . 'capabilities';
+
+			// Query
+			$customers = $wpdb->get_results( $wpdb->prepare(
+				"
+					SELECT 
+						a.user_id as id,
+						b.meta_value as last_updated
+					FROM $wpdb->usermeta AS a
+					INNER JOIN $wpdb->usermeta AS b
+						ON b.user_id = a.user_id
+						AND b.meta_key = 'last_update'
+						AND b.meta_value > %d
+					WHERE a.meta_key = %s 
+					LIMIT %d, %d
+				", array(
+					$time,
+					$cap_column,
+					$offset,
+					$limit
+				)
+			) );
+		} else {
+			// Not multisite
+			$customers = $wpdb->get_results( $wpdb->prepare(
+				"
+					SELECT 
+						user_id as id,
+						meta_value as last_updated
+					FROM $wpdb->usermeta
+					WHERE meta_key = 'last_update' 
+						AND meta_value > %d
+					LIMIT %d, %d
+				", array(
+					$time,
+					$offset,
+					$limit
+				)
+			) );
+		}
 
 		/**
 		 * Prepare response.
