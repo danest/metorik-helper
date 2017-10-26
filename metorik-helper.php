@@ -3,9 +3,11 @@
  * Plugin Name: Metorik Helper
  * Plugin URI: https://metorik.com
  * Description: Provides some fixes & extensions for WooCommerce, required by Metorik.
- * Version: 0.11.0
+ * Version: 0.12.0
  * Author: Metorik
  * Author URI: https://metorik.com
+ * WC requires at least: 2.6.0
+ * WC tested up to: 3.2.0
 */
 
 class Metorik_Helper {
@@ -13,7 +15,7 @@ class Metorik_Helper {
 	/** 
 	 * Current version of Metorik.
 	 */
-	public $version = '0.11.0';
+	public $version = '0.12.0';
 
 	/**
 	 * URL dir for plugin.
