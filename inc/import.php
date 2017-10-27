@@ -4,27 +4,31 @@
  * These are small changes that help Metorik complete it's import of the store.
  */
 class Metorik_Import_Helpers {
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		add_filter( 'woocommerce_rest_prepare_customer', array( $this, 'filter_prepare_customer' ), 10, 3);
+		add_action( 'rest_api_init', array( $this, 'maybe_filter_customers' ) );
 	}
 
 	/**
-	 * Filter Woo's API prepare customer so we can filter customer
-	 * meta data if it's Metorik making an API request.
+	 * Maybe filter customers if it's Metorik making the request or custom param set.
 	 */
-	public function filter_prepare_customer( $response, $user_data, $request ) {
-		// get request headers
-		$headers = $request->get_headers();
+	public function maybe_filter_customers( $server ) {
+		// get headers
+		$headers = $server->get_headers( $_SERVER );
 
-		// check we have headers and user agent set and string,
+		// make header keys lowercase
+		$headers = array_change_key_case( $headers );
+
+		// check we have headers and user agent set and string
 		if ( 
 			$headers && 
 			isset( $headers['user_agent'] ) && 
-			isset( $headers['user_agent'][0] ) &&
-			is_string( $headers['user_agent'][0] )
+			$headers['user_agent']
 		) {
 			// get user agent
-			$user_agent = strtolower( $headers['user_agent'][0] );
+			$user_agent = strtolower( $headers['user_agent'] );
 
 			// if user agent has metorik in it, filter user meta to stop total spend/order count calculations
 			if ( strpos( $user_agent, 'metorik' ) !== false ) {
@@ -33,12 +37,9 @@ class Metorik_Import_Helpers {
 		}
 
 		// or as a backup method - check if no spend data param is set
-		if ( $request->get_param( 'no_spend_data' ) ) {
+		if ( isset( $_GET['no_spend_data'] ) && $_GET['no_spend_data'] ) {
 			add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
 		}
-
-		// regardless, return response
-		return $response;
 	}
 
 	/**

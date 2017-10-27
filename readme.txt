@@ -109,6 +109,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 = 0.12.0 =
 * Multisite support for customers/updated endpoint.
 * Added WooCommerce 3.2 required/tested plugin headers.
+* Improve Woo customers API performance.
 
 = 0.11.0 =
 * Change method for stopping customer spend calculations in API so it just does it for Metorik API requests instead of on a time-basis by option.
