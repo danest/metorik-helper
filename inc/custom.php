@@ -4,7 +4,14 @@
  * Custom changes that Metorik implements, like tracking referer.
  */
 class Metorik_Custom {
-	public $possibleUtms = array( 'utm_source', 'utm_medium', 'utm_campaign' );
+	public $possibleUtms = array( 
+		'utm_source', 
+		'utm_medium', 
+		'utm_campaign',
+		'utm_term',
+		'utm_content',
+		'utm_id'
+	);
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'set_referer' ) );
@@ -34,7 +41,14 @@ class Metorik_Custom {
 		}
 
 		// set UTM tags if there are any
-		if ( isset( $_GET['utm_source'] ) || isset( $_GET['utm_medium']  ) || isset( $_GET['utm_campaign'] ) ) {
+		if ( 
+			isset( $_GET['utm_source'] ) || 
+			isset( $_GET['utm_medium']  ) || 
+			isset( $_GET['utm_campaign'] ) ||
+			isset( $_GET['utm_term'] ) ||
+			isset( $_GET['utm_content'] ) ||
+			isset( $_GET['utm_id'] )
+		) {
 			$time = apply_filters( 'metorik_utm_cookie_time', 3600 * 24 * 180 ); // 180 days
 			
 			foreach ( $this->possibleUtms as $possible ) {
