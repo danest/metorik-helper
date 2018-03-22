@@ -91,9 +91,9 @@ Yes, you do ([sign up here](https://metorik.com?ref=wporg)). It will still work 
 
 If you truly want to (but why! They're so handy), you can. Simply add:
 
-```
+`
 add_filter( 'metorik_show_ui', '__return_false' );
-```
+`
 
 To your theme's `functions.php` or a custom plugin.
 
