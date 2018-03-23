@@ -38,20 +38,6 @@ class Metorik_Custom {
 	 */
 	public $fieldPrefix = 'metorik_source_';
 
-	/**
-	 * Possible UTMs.
-	 *
-	 * @var array
-	 */
-	public $possibleUtms = array( 
-		'utm_source', 
-		'utm_medium', 
-		'utm_campaign',
-		'utm_term',
-		'utm_content',
-		'utm_id'
-	);
-
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
 
