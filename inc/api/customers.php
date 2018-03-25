@@ -505,7 +505,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller {
 		// Wrap the data in a response object.
 		$response = rest_ensure_response( $data );
 
-		$response->add_links( $this->prepare_links( $customer ) );
+		$response->add_links( $this->prepare_links( $customer, $request ) );
 
 		/**
 		 * Filter customer data returned from the REST API.
