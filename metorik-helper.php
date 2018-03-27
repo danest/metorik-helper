@@ -54,6 +54,7 @@ class Metorik_Helper {
 			add_action( 'admin_notices', array( $this, 'activate_notice' ) );
 
 			// Require files for the plugin
+			require_once( 'inc/functions.php' );
 			require_once( 'inc/import.php' );
 			require_once( 'inc/api.php' );
 			require_once( 'inc/ui.php' );
