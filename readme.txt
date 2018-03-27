@@ -107,7 +107,10 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 
 == Changelog ==
 = 0.14.0 =
-* @todo
+* PHP 7.2 WC API fix.
+* Move customer source tracking to JS.
+* Additional source tracking data like session count, page count, etc.
+* Performance improvements for the orders API endpoint.
 
 = 0.13.0 =
 * Add support for recording UTM term, content, and ID.
