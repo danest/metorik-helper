@@ -4,121 +4,151 @@
  * Custom changes that Metorik implements, like tracking referer.
  */
 class Metorik_Custom {
-	public $possibleUtms = array( 
-		'utm_source', 
-		'utm_medium', 
+	/** 
+	 * Current version of Metorik.
+	 */
+	public $version = '0.14.0';
+
+	/**
+	 * Possible fields.
+	 */
+	public $fields = array(
+		// main
+		'type',
+		'url',
+		'mtke',
+
+		// utm
 		'utm_campaign',
-		'utm_term',
+		'utm_source',
+		'utm_medium',
 		'utm_content',
-		'utm_id'
+		'utm_id',
+		'utm_term',
+
+		// additional
+		'session_entry',
+		'session_start_time',
+		'session_pages',
+		'session_count',
 	);
 
+	/**
+	 * Field prefix (for the input field names).
+	 */
+	public $fieldPrefix = 'metorik_source_';
+
 	public function __construct() {
-		add_action( 'init', array( $this, 'set_referer' ) );
-		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'set_order_referer' ) );
-		add_action( 'woocommerce_checkout_update_user_meta', array( $this, 'set_customer_referer' ) );
-		add_action( 'user_register', array( $this, 'set_customer_referer' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
+
+		// fields
+		add_action( 'woocommerce_after_order_notes', array( $this, 'source_form_fields' ) );
+		add_action( 'woocommerce_register_form', array( $this, 'source_form_fields' ) );
+
+		// update
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'set_order_source' ) );
+		add_action( 'woocommerce_checkout_update_user_meta', array( $this, 'set_customer_source' ) );
+		add_action( 'user_register', array( $this, 'set_customer_source' ) );
 	}
 
 	/**
-	 * Set the referer. We use a cookie, as sessions in WP
-	 * are a bit unreliable and cookie here is easier.
+	 * Scripts for Metorik's custom source tracking.
 	 */
-	public function set_referer() {
-		// check if none in cookie already and http referer is set
-		if ( ! isset( $_COOKIE['metorik_http_referer'] ) && isset( $_SERVER['HTTP_REFERER'] ) ) {
-			// get referer
-			$referer = sanitize_text_field( $_SERVER['HTTP_REFERER'] );
+	public function scripts() {
+		/**
+		 * Enqueue sourcebuster and Metorik JS.
+		 */
+		wp_enqueue_script( 'sourcebuster', plugins_url( 'assets/js/sourcebuster.min.js', dirname( __FILE__ ) ), '', '1.1.0', true );
+		wp_enqueue_script( 'metorik-js', plugins_url( 'assets/js/metorik.js', dirname( __FILE__ ) ), array( 'sourcebuster', 'jquery' ), $this->version, true );
+		
+		/**
+		 * Pass parameters to Metorik JS.
+		 */
+		$params = array(
+			'lifetime' => (int) apply_filters( 'metorik_cookie_lifetime', 6 ), // 6 months
+			'session' => (int) apply_filters( 'metorik_session_length', 30 ), // 30 minutes
+		);
+		wp_localize_script( 'metorik-js', 'metorik_params', $params );
+	}
 
-			// if referer same this site, don't set it
-			if ( strpos( $referer, home_url() ) !== false ) {
-				return;
-			}
-
-			// store in cookie (sessions not reliable enough)
-			$time = apply_filters( 'metorik_referer_cookie_time', 3600 * 24 * 180 ); // 180 days
-			setcookie( 'metorik_http_referer', $referer, time() + $time, '/' );
-		}
-
-		// set UTM tags if there are any
-		if ( 
-			isset( $_GET['utm_source'] ) || 
-			isset( $_GET['utm_medium']  ) || 
-			isset( $_GET['utm_campaign'] ) ||
-			isset( $_GET['utm_term'] ) ||
-			isset( $_GET['utm_content'] ) ||
-			isset( $_GET['utm_id'] )
-		) {
-			$time = apply_filters( 'metorik_utm_cookie_time', 3600 * 24 * 180 ); // 180 days
-			
-			foreach ( $this->possibleUtms as $possible ) {
-				if ( isset( $_GET[$possible] ) && $_GET[$possible] ) {
-					$value = sanitize_text_field( $_GET[$possible] );
-					setcookie( 'metorik_' . $possible, $value, time() + $time, '/' );
-				}
-			}
-		}
-
-		// set Engage data if have any
-		if ( isset( $_GET['mtke'] ) ) {
-			$time = apply_filters( 'metorik_engage', 3600 * 24 * 180 ); // 180 days
-			$value = sanitize_text_field( $_GET['mtke'] );
-			setcookie( 'metorik_engage', $value, time() + $time, '/' );
+	/**
+	 * Add Metorik hidden input fields for checkout & customer register froms.
+	 */
+	public function source_form_fields() {
+		/**
+		 * Hidden field for each possible field.
+		 */
+		foreach( $this->fields as $field ) {
+			echo '<input type="hidden" name="' . $this->fieldPrefix . $field . '" value="" />';
 		}
 	}
 
 	/**
-	 * Set the referer on the order in the post meta.
+	 * Set the source data in the order post meta.
 	 */
-	public function set_order_referer( $order_id ) {
-		// if we have a referer, get it and set in order meta
-		if ( isset( $_COOKIE['metorik_http_referer'] ) ) {
-			$referer = apply_filters( 'metorik_order_referer', sanitize_text_field( $_COOKIE['metorik_http_referer'] ) );
-			update_post_meta( $order_id, '_metorik_referer', $referer );
-		}
-
-		// If we have any UTM tags, set them
-		foreach ( $this->possibleUtms as $utm ) {
-			if ( isset( $_COOKIE['metorik_' . $utm] ) ) {
-				$value = sanitize_text_field( $_COOKIE['metorik_' . $utm] );
-				update_post_meta( $order_id, '_metorik_' . $utm, $value );
-			}
-		}
-
-		// if we have a metorik engage key, get it and set in order meta
-		if ( isset( $_COOKIE['metorik_engage'] ) ) {
-			$engage = apply_filters( 'metorik_order_engage', sanitize_text_field( $_COOKIE['metorik_engage'] ) );
-			update_post_meta( $order_id, '_metorik_engage', $engage );
-		}
+	public function set_order_source ( $order_id ) {
+		$this->set_source_data( $order_id, 'order' );
 	}
 
 	/**
-	 * Set the referer on the customer in the user meta.
+	 * Set the source data in the customer user meta.
 	 */
-	public function set_customer_referer( $user_id ) {
-		// no user id? return
-		if ( ! $user_id ) {
-			return;
-		}
+	public function set_customer_source ( $customer_id ) {
+		$this->set_source_data( $customer_id, 'customer' );
+	}
 
-		// if we have a referer, get it and set in order meta
-		if ( isset( $_COOKIE['metorik_http_referer'] ) ) {
-			$referer = apply_filters( 'metorik_customer_referer', sanitize_text_field( $_COOKIE['metorik_http_referer'] ) );
-			update_user_meta( $user_id, '_metorik_referer', $referer );
-		}
+	/**
+	 * Set source data.
+	 */
+	public function set_source_data( $id, $resource ) {
+		/**
+		 * Values.
+		 */
+		$values = array();
 
-		// If we have any UTM tags, set them
-		foreach ( $this->possibleUtms as $utm ) {
-			if ( isset( $_COOKIE['metorik_' . $utm] ) ) {
-				$value = sanitize_text_field( $_COOKIE['metorik_' . $utm] );
-				update_user_meta( $user_id, '_metorik_' . $utm, $value );
+		/**
+		 * Get each field if POSTed.
+		 */
+		foreach ( $this->fields as $field ) {
+			// default empty
+			$values[$field] = '';
+
+			// set if have
+			if ( isset( $_POST[$this->fieldPrefix . $field] ) && $_POST[$this->fieldPrefix . $field] ) {
+				$values[$field] = sanitize_text_field( $_POST[$this->fieldPrefix . $field] );
 			}
 		}
 
-		// if we have a metorik engage key, get it and set in customer meta
-		if ( isset( $_COOKIE['metorik_engage'] ) ) {
-			$engage = apply_filters( 'metorik_order_engage', sanitize_text_field( $_COOKIE['metorik_engage'] ) );
-			update_user_meta( $user_id, '_metorik_engage', $engage );
+		/**
+		 * Now parse values to set in meta.
+		 */
+
+		// update function based on order or customer
+		$update_function = $resource == 'order' ? 'update_post_meta' : 'update_user_meta';
+
+		// type
+		if ( $values['type'] && $values['type'] !== '(none)' ) {
+			$update_function( $id, '_metorik_source_type', $values['type'] );
+			unset( $values['type'] );
+		}
+
+		// referer url
+		if ( $values['url'] && $values['url'] !== '(none)' ) {
+			$update_function( $id, '_metorik_referer', $values['url'] );
+			unset( $values['url'] );
+		}
+
+		// metorik engage
+		if ( $values['mtke'] && $values['mtke'] !== '(none)' ) {
+			$update_function( $id, '_metorik_engage', $values['mtke'] );
+			unset( $values['mtke'] );
+		}
+
+		// rest of fields - UTMs & sessions (if not '(none)')
+		foreach ( $values as $key => $value ) {
+			if ( $value !== '(none)' ) {
+				$update_function( $id, '_metorik_' . $key, $value );
+			}
 		}
 	}
 }

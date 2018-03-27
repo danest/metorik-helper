@@ -20,6 +20,11 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller {
 		if ( version_compare( WC()->version, '2.7.0', '<' ) ) {
 			add_filter( 'woocommerce_rest_prepare_shop_order', array( $this, 'add_order_api_data' ), 10, 3 );
 		}
+
+		// if 3.0 or higher, remove coupon line items meta
+		if ( version_compare( WC()->version, '3.0.0', '>=' ) ) {
+			add_filter( 'woocommerce_rest_prepare_shop_order_object', array($this, 'remove_coupon_line_items_meta' ), 10, 3 );
+		}
 	}
 
 	/**
@@ -205,6 +210,31 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller {
 		$order = wc_get_order( $post );
 		$data['meta_data'] = $this->get_order_post_meta( $post->ID );
 		$response->set_data( $data );
+		return $response;
+	}
+
+	/**
+	 * Remove the coupon lines meta data. Can be very
+	 * large when the coupon has rules/used a lot.
+	 */
+	public function remove_coupon_line_items_meta( $response, $post, $request ) {
+		// check for metorik user agent before continuing
+		if ( metorik_check_headers_agent( $request->get_headers( $_SERVER ) ) ) {
+			// get response data
+			$_data = $response->data;
+
+			if ( isset( $_data['coupon_lines'] ) && count( $_data['coupon_lines'] ) ) {
+				// remove meta each line item from response
+				foreach( $_data['coupon_lines'] as $key => $line ) {
+					unset( $_data['coupon_lines'][$key]['meta_data'] );
+				}
+			}
+
+			// set response
+			$response->data = $_data;
+		}
+		
+		// return response
 		return $response;
 	}
 

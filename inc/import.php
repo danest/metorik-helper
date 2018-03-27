@@ -18,27 +18,14 @@ class Metorik_Import_Helpers {
 		// get headers
 		$headers = $server->get_headers( $_SERVER );
 
-		// make header keys lowercase
-		$headers = array_change_key_case( $headers );
-
-		// check we have headers and user agent set and string
-		if ( 
-			$headers && 
-			isset( $headers['user_agent'] ) && 
-			$headers['user_agent']
-		) {
-			// get user agent
-			$user_agent = strtolower( $headers['user_agent'] );
-
-			// if user agent has metorik in it, filter user meta to stop total spend/order count calculations
-			if ( strpos( $user_agent, 'metorik' ) !== false ) {
+		// if metorik user agent, filter user meta to stop total spend/order count calculations
+		if ( metorik_check_headers_agent( $headers ) ) {
+			add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
+		} else {
+			// or as a backup method - check if no spend data param is set
+			if ( isset( $_GET['no_spend_data'] ) && $_GET['no_spend_data'] ) {
 				add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
 			}
-		}
-
-		// or as a backup method - check if no spend data param is set
-		if ( isset( $_GET['no_spend_data'] ) && $_GET['no_spend_data'] ) {
-			add_filter( 'get_user_metadata', array( $this, 'filter_user_metadata' ), 10, 4 );
 		}
 	}
 
