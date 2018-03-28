@@ -7,7 +7,7 @@ class Metorik_Custom {
 	/** 
 	 * Current version of Metorik.
 	 */
-	public $version = '0.14.0';
+	public $version = '0.14.1';
 
 	/**
 	 * Possible fields.
@@ -129,24 +129,24 @@ class Metorik_Custom {
 		// type
 		if ( $values['type'] && $values['type'] !== '(none)' ) {
 			$update_function( $id, '_metorik_source_type', $values['type'] );
-			unset( $values['type'] );
 		}
+		unset( $values['type'] );
 
 		// referer url
 		if ( $values['url'] && $values['url'] !== '(none)' ) {
 			$update_function( $id, '_metorik_referer', $values['url'] );
-			unset( $values['url'] );
 		}
+		unset( $values['url'] );
 
 		// metorik engage
 		if ( $values['mtke'] && $values['mtke'] !== '(none)' ) {
 			$update_function( $id, '_metorik_engage', $values['mtke'] );
-			unset( $values['mtke'] );
 		}
+		unset( $values['mtke'] );
 
 		// rest of fields - UTMs & sessions (if not '(none)')
 		foreach ( $values as $key => $value ) {
-			if ( $value !== '(none)' ) {
+			if ( $value && $value !== '(none)' ) {
 				$update_function( $id, '_metorik_' . $key, $value );
 			}
 		}
