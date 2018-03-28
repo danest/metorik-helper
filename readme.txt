@@ -106,6 +106,9 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
+= 0.14.1 =
+* Fix empty source data being stored.
+
 = 0.14.0 =
 * PHP 7.2 WC API fix.
 * Move customer source tracking to JS.
