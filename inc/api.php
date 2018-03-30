@@ -3,28 +3,29 @@
 /**
  * This class loads Metorik's API endpoints/code.
  */
-class Metorik_Helper_API {
+class Metorik_Helper_API
+{
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->includes();
+    }
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->includes();
-	}
-
-	/**
-	 * Include necessary files for the API.
-	 */
-	public function includes()
-	{
-		require_once( 'api/orders.php' );
-		require_once( 'api/customers.php' );
-		require_once( 'api/products.php' );
-		require_once( 'api/coupons.php' );
-		require_once( 'api/subscriptions.php' );
-		require_once( 'api/refunds.php' );
-		require_once( 'api/metorik.php' );
-	}
+    /**
+     * Include necessary files for the API.
+     */
+    public function includes()
+    {
+        require_once 'api/orders.php';
+        require_once 'api/customers.php';
+        require_once 'api/products.php';
+        require_once 'api/coupons.php';
+        require_once 'api/subscriptions.php';
+        require_once 'api/refunds.php';
+        require_once 'api/metorik.php';
+    }
 }
 
 new Metorik_Helper_API();
