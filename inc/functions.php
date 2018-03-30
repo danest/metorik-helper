@@ -3,29 +3,30 @@
 /**
  * Check if a headers array contains the Metorik user agent.
  */
-function metorik_check_headers_agent( $headers ) {
+function metorik_check_headers_agent($headers)
+{
     // make header keys lowercase
-    $headers = array_change_key_case( $headers );
-    
+    $headers = array_change_key_case($headers);
+
     // check if headers has user agent
-    if ( 
-        $headers && 
-        isset( $headers['user_agent'] ) && 
+    if (
+        $headers &&
+        isset($headers['user_agent']) &&
         $headers['user_agent']
     ) {
         // get user agent
         $user_agent = $headers['user_agent'];
 
         // if array, use first key
-        if ( is_array( $user_agent ) ) {
+        if (is_array($user_agent)) {
             $user_agent = $user_agent[0];
         }
 
         // lowercase
-        $user_agent = strtolower( $user_agent );
+        $user_agent = strtolower($user_agent);
 
         // if user agent has metorik in it return true
-        if ( strpos( $user_agent, 'metorik' ) !== false ) {
+        if (strpos($user_agent, 'metorik') !== false) {
             return true;
         }
     }
