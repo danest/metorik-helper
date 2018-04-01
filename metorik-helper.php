@@ -47,7 +47,7 @@ class Metorik_Helper
      */
     public function __construct()
     {
-        add_action('plugins_loaded', [$this, 'init']);
+        add_action('plugins_loaded', array($this, 'init'));
 
         // Set URL
         $this->url = plugin_dir_url(__FILE__);
@@ -60,7 +60,7 @@ class Metorik_Helper
     {
         if (class_exists('WooCommerce')) {
             // Activate notice (shown once)
-            add_action('admin_notices', [$this, 'activate_notice']);
+            add_action('admin_notices', array($this, 'activate_notice'));
 
             // Require files for the plugin
             require_once 'inc/functions.php';
@@ -69,7 +69,7 @@ class Metorik_Helper
             require_once 'inc/ui.php';
             require_once 'inc/custom.php';
         } else {
-            add_action('admin_notices', [$this, 'no_wc']);
+            add_action('admin_notices', array($this, 'no_wc'));
         }
     }
 
@@ -107,7 +107,7 @@ class Metorik_Helper
 }
 
 // Notice after it's been activated
-register_activation_hook(__FILE__, ['Metorik_Helper', 'activate']);
+register_activation_hook(__FILE__, array('Metorik_Helper', 'activate'));
 
 /**
  * For plugin-wide access to initial instance.

@@ -10,16 +10,16 @@ class Metorik_UI
         // filter to hide it
         if (apply_filters('metorik_show_ui', true)) {
             // product/order meta boxes
-            add_action('admin_head', [$this, 'custom_css']);
-            add_action('add_meta_boxes', [$this, 'register_meta_boxes']);
+            add_action('admin_head', array($this, 'custom_css'));
+            add_action('add_meta_boxes', array($this, 'register_meta_boxes'));
 
             // customers table
-            add_filter('manage_users_columns', [$this, 'modify_user_table']);
-            add_filter('manage_users_custom_column', [$this, 'add_user_table_column'], 10, 3);
+            add_filter('manage_users_columns', array($this, 'modify_user_table'));
+            add_filter('manage_users_custom_column', array($this, 'add_user_table_column'), 10, 3);
 
             // admin notices (for reports)
-            add_action('admin_init', [$this, 'check_admin_notices_dismiss']);
-            add_action('admin_notices', [$this, 'admin_notices']);
+            add_action('admin_init', array($this, 'check_admin_notices_dismiss'));
+            add_action('admin_notices', array($this, 'admin_notices'));
         }
     }
 
@@ -28,10 +28,10 @@ class Metorik_UI
      */
     public function custom_css()
     {
-        $ids = [
+        $ids = array(
             'metorik-product-box',
             'metorik-order-box',
-        ];
+        );
 
         echo '<style>';
 
@@ -58,8 +58,8 @@ class Metorik_UI
      */
     public function register_meta_boxes()
     {
-        add_meta_box('metorik-product-box', __('Metorik', 'metorik'), [$this, 'product_box_display'], 'product', 'side', 'high');
-        add_meta_box('metorik-order-box', __('Metorik', 'metorik'), [$this, 'order_box_display'], 'shop_order', 'side', 'high');
+        add_meta_box('metorik-product-box', __('Metorik', 'metorik'), array($this, 'product_box_display'), 'product', 'side', 'high');
+        add_meta_box('metorik-order-box', __('Metorik', 'metorik'), array($this, 'order_box_display'), 'shop_order', 'side', 'high');
     }
 
     /**
@@ -156,56 +156,56 @@ class Metorik_UI
 
                 switch ($report) {
                     case 'sales_by_date':
-                        $links = [
-                            [
+                        $links = array(
+                            array(
                                 'report' => 'Sales Report',
                                 'link'   => 'reports/orders',
-                            ],
-                            [
+                            ),
+                            array(
                                 'report' => 'Refunds Report',
                                 'link'   => 'reports/refunds',
-                            ],
-                        ];
+                            ),
+                        );
                         break;
                     case 'sales_by_product':
-                        $links = [
-                            [
+                        $links = array(
+                            array(
                                 'report' => 'All Products',
                                 'link'   => 'products',
-                            ],
-                            [
+                            ),
+                            array(
                                 'report' => 'Compare Products',
                                 'link'   => 'reports/products',
-                            ],
-                        ];
+                            ),
+                        );
                         break;
                     case 'sales_by_category':
-                        $links = [
-                            [
+                        $links = array(
+                            array(
                                 'report' => 'All Categories',
                                 'link'   => 'categories',
-                            ],
-                        ];
+                            ),
+                        );
                         break;
                     case 'customers':
-                        $links = [
-                            [
+                        $links = array(
+                            array(
                                 'report' => 'Customers Report',
                                 'link'   => 'reports/customers',
-                            ],
-                            [
+                            ),
+                            array(
                                 'report' => 'Customer Retention',
                                 'link'   => 'reports/customer-retention',
-                            ],
-                        ];
+                            ),
+                        );
                         break;
                     case 'customer_list':
-                        $links = [
-                            [
+                        $links = array(
+                            array(
                                 'report' => 'All Customers',
                                 'link'   => 'customers',
-                            ],
-                        ];
+                            ),
+                        );
                         break;
                 }
             }
@@ -217,20 +217,20 @@ class Metorik_UI
                 if ($type) {
                     switch ($type) {
                         case 'shop_order':
-                            $links = [
-                                [
+                            $links = array(
+                                array(
                                     'report' => 'All Orders',
                                     'link'   => 'orders',
-                                ],
-                            ];
+                                ),
+                            );
                             break;
                         case 'product':
-                            $links = [
-                                [
+                            $links = array(
+                                array(
                                     'report' => 'All Products',
                                     'link'   => 'products',
-                                ],
-                            ];
+                                ),
+                            );
                             break;
                     }
                 }
@@ -238,12 +238,12 @@ class Metorik_UI
 
             // users
             if ($screen == 'users') {
-                $links = [
-                    [
+                $links = array(
+                    array(
                         'report' => 'All Customers',
                         'link'   => 'customers',
-                    ],
-                ];
+                    ),
+                );
             }
 
             if ($screen == 'edit-tags') {
@@ -251,12 +251,12 @@ class Metorik_UI
                 $type = isset($_GET['post_type']) ? sanitize_text_field($_GET['post_type']) : false;
 
                 if ($tax == 'product_cat' && $type == 'product') {
-                    $links = [
-                        [
+                    $links = array(
+                        array(
                             'report' => 'All Categories',
                             'link'   => 'categories',
-                        ],
-                    ];
+                        ),
+                    );
                 }
             }
 

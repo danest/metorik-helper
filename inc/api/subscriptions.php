@@ -14,8 +14,8 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
      */
     public function __construct()
     {
-        add_action('rest_api_init', [$this, 'subscriptions_ids_route']);
-        add_action('rest_api_init', [$this, 'subscriptions_updated_route']);
+        add_action('rest_api_init', array($this, 'subscriptions_ids_route'));
+        add_action('rest_api_init', array($this, 'subscriptions_updated_route'));
     }
 
     /**
@@ -23,11 +23,11 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
      */
     public function subscriptions_ids_route()
     {
-        register_rest_route($this->namespace, '/subscriptions/ids/', [
+        register_rest_route($this->namespace, '/subscriptions/ids/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'subscriptions_ids_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'subscriptions_ids_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -35,11 +35,11 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
      */
     public function subscriptions_updated_route()
     {
-        register_rest_route($this->namespace, '/subscriptions/updated/', [
+        register_rest_route($this->namespace, '/subscriptions/updated/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'subscriptions_updated_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'subscriptions_updated_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -51,12 +51,12 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
         /**
          * Get subscriptions.
          */
-        $subscriptions = new WP_Query([
+        $subscriptions = new WP_Query(array(
             'post_type'      => $this->post_type,
             'posts_per_page' => -1,
             'post_status'    => 'any',
             'fields'         => 'ids',
-        ]);
+        ));
 
         /*
          * No subscriptions.
@@ -68,10 +68,10 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'count' => $subscriptions->post_count,
             'ids'   => $subscriptions->posts,
-        ];
+        );
 
         /**
          * Response.
@@ -142,19 +142,19 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
 					AND post_modified > %s
 					AND post_status != 'trash'
 				LIMIT %d, %d
-			", [
+			", array(
                 $from,
                 $offset,
                 $limit,
-            ]
+            )
         ));
 
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'subscriptions' => $subscriptions,
-        ];
+        );
 
         /**
          * Response.

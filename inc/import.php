@@ -10,7 +10,7 @@ class Metorik_Import_Helpers
      */
     public function __construct()
     {
-        add_action('rest_api_init', [$this, 'maybe_filter_customers']);
+        add_action('rest_api_init', array($this, 'maybe_filter_customers'));
     }
 
     /**
@@ -23,11 +23,11 @@ class Metorik_Import_Helpers
 
         // if metorik user agent, filter user meta to stop total spend/order count calculations
         if (metorik_check_headers_agent($headers)) {
-            add_filter('get_user_metadata', [$this, 'filter_user_metadata'], 10, 4);
+            add_filter('get_user_metadata', array($this, 'filter_user_metadata'), 10, 4);
         } else {
             // or as a backup method - check if no spend data param is set
             if (isset($_GET['no_spend_data']) && $_GET['no_spend_data']) {
-                add_filter('get_user_metadata', [$this, 'filter_user_metadata'], 10, 4);
+                add_filter('get_user_metadata', array($this, 'filter_user_metadata'), 10, 4);
             }
         }
     }
@@ -44,7 +44,7 @@ class Metorik_Import_Helpers
     public function filter_user_metadata($value, $object_id, $meta_key, $single)
     {
         // Check if it's one of the keys we want to filter
-        if (in_array($meta_key, ['_money_spent', '_order_count'])) {
+        if (in_array($meta_key, array('_money_spent', '_order_count'))) {
             // Return 0 so WC doesn't try calculate it
             return 0;
         }

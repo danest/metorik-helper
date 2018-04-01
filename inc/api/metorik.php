@@ -12,8 +12,8 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
      */
     public function __construct()
     {
-        add_action('rest_api_init', [$this, 'metorik_info_route']);
-        add_action('rest_api_init', [$this, 'metorik_importing_route']);
+        add_action('rest_api_init', array($this, 'metorik_info_route'));
+        add_action('rest_api_init', array($this, 'metorik_importing_route'));
     }
 
     /**
@@ -21,11 +21,11 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
      */
     public function metorik_info_route()
     {
-        register_rest_route($this->namespace, '/metorik/info/', [
+        register_rest_route($this->namespace, '/metorik/info/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'metorik_info_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'metorik_info_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -33,11 +33,11 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
      */
     public function metorik_importing_route()
     {
-        register_rest_route($this->namespace, '/metorik/importing/', [
+        register_rest_route($this->namespace, '/metorik/importing/', array(
             'methods'             => WP_REST_Server::EDITABLE,
-            'callback'            => [$this, 'update_metorik_importing_callback'],
-            'permission_callback' => [$this, 'update_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'update_metorik_importing_callback'),
+            'permission_callback' => array($this, 'update_items_permissions_check'),
+        ));
     }
 
     /**
@@ -46,7 +46,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
     public function get_items_permissions_check($request)
     {
         if (!wc_rest_check_user_permissions('read')) {
-            return new WP_Error('woocommerce_rest_cannot_view', __('Sorry, you cannot list resources.', 'woocommerce'), ['status' => rest_authorization_required_code()]);
+            return new WP_Error('woocommerce_rest_cannot_view', __('Sorry, you cannot list resources.', 'woocommerce'), array('status' => rest_authorization_required_code()));
         }
 
         return true;
@@ -58,7 +58,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
     public function update_items_permissions_check()
     {
         if (!wc_rest_check_user_permissions('create')) {
-            return new WP_Error('woocommerce_rest_cannot_create', __('Sorry, you are not allowed to create resources.', 'woocommerce'), ['status' => rest_authorization_required_code()]);
+            return new WP_Error('woocommerce_rest_cannot_create', __('Sorry, you are not allowed to create resources.', 'woocommerce'), array('status' => rest_authorization_required_code()));
         }
 
         return true;
@@ -81,11 +81,11 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'active'  => true,
             'version' => Metorik_Helper()->version,
             'plugins' => $plugins,
-        ];
+        );
 
         /**
          * Response.
@@ -105,7 +105,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
          * Check status set.
          */
         if (!isset($request['status'])) {
-            return new WP_Error('woocommerce_rest_metorik_invalid_importing_status', __('Invalid status.', 'woocommerce'), ['status' => 400]);
+            return new WP_Error('woocommerce_rest_metorik_invalid_importing_status', __('Invalid status.', 'woocommerce'), array('status' => 400));
         }
 
         /**
@@ -121,10 +121,10 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'updated' => true,
             'status'  => get_option('metorik_importing_currently'),
-        ];
+        );
 
         /**
          * Response.
