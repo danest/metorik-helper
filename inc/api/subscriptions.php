@@ -16,7 +16,7 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
     {
         add_action('rest_api_init', array($this, 'subscriptions_ids_route'));
         add_action('rest_api_init', array($this, 'subscriptions_updated_route'));
-        add_filter( 'woocommerce_rest_prepare_shop_subscription', array( $this, 'add_subscription_meta' ), 10, 3 );
+        add_filter('woocommerce_rest_prepare_shop_subscription', array($this, 'add_subscription_meta'), 10, 3);
     }
 
     /**
@@ -166,27 +166,29 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
         return $response;
     }
 
+    /**
+     * Add the Subscriptions meta to response.
+     */
+    public function add_subscription_meta($response, $post, $request)
+    {
+        $data = $response->get_data();
+        $order = wc_get_order($post);
+        $data['meta_data'] = $this->get_subscription_meta_data($post->ID);
+        $response->set_data($data);
 
-	/**
-	 * Add the Subscriptions meta to response.
-	 */
-	public function add_subscription_meta( $response, $post, $request ) {
-		$data = $response->get_data();
-		$order = wc_get_order( $post );
-		$data['meta_data'] = $this->get_subscription_meta_data( $post->ID );
-		$response->set_data( $data );
-		return $response;
-	}
+        return $response;
+    }
 
-	/**
-	 * Get the order's post meta for returning in filtered API response.
-	 */
-	public function get_subscription_meta_data( $id ) {
-		global $wpdb;
+    /**
+     * Get the order's post meta for returning in filtered API response.
+     */
+    public function get_subscription_meta_data($id)
+    {
+        global $wpdb;
 
-		// query to get all the post's meta
-		$metadata = $wpdb->get_results( $wpdb->prepare(
-			"
+        // query to get all the post's meta
+        $metadata = $wpdb->get_results($wpdb->prepare(
+            "
 				SELECT 
 					meta_id,
 					meta_key,
@@ -194,89 +196,89 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
 				FROM $wpdb->postmeta
 				WHERE post_id = %d 
 			", array(
-				$id
-			)
-		) );
+                $id,
+            )
+        ));
 
-		// ignore some keys
-		$ignored_keys = array (
-			'_customer_user',
-			'_order_key',
-			'_order_currency',
-			'_billing_first_name',
-			'_billing_last_name',
-			'_billing_company',
-			'_billing_address_1',
-			'_billing_address_2',
-			'_billing_city',
-			'_billing_state',
-			'_billing_postcode',
-			'_billing_country',
-			'_billing_email',
-			'_billing_phone',
-			'_shipping_first_name',
-			'_shipping_last_name',
-			'_shipping_company',
-			'_shipping_address_1',
-			'_shipping_address_2',
-			'_shipping_city',
-			'_shipping_state',
-			'_shipping_postcode',
-			'_shipping_country',
-			'_completed_date',
-			'_paid_date',
-			'_edit_lock',
-			'_edit_last',
-			'_cart_discount',
-			'_cart_discount_tax',
-			'_order_shipping',
-			'_order_shipping_tax',
-			'_order_tax',
-			'_order_total',
-			'_payment_method',
-			'_payment_method_title',
-			'_transaction_id',
-			'_customer_ip_address',
-			'_customer_user_agent',
-			'_created_via',
-			'_order_version',
-			'_prices_include_tax',
-			'_date_completed',
-			'_date_paid',
-			'_payment_tokens',
-			'_billing_address_index',
-			'_shipping_address_index',
-			'_recorded_sales',
-			'_shipping_method',
-			'_order_currency',
-			'_cart_discount',
-			'_cart_discount_tax',
-			'_order_shipping',
-			'_order_shipping_tax',
-			'_order_tax',
-			'_order_total',
-			'_order_version',
-			'_prices_include_tax',
-			'_payment_tokens',
-		);
+        // ignore some keys
+        $ignored_keys = array(
+            '_customer_user',
+            '_order_key',
+            '_order_currency',
+            '_billing_first_name',
+            '_billing_last_name',
+            '_billing_company',
+            '_billing_address_1',
+            '_billing_address_2',
+            '_billing_city',
+            '_billing_state',
+            '_billing_postcode',
+            '_billing_country',
+            '_billing_email',
+            '_billing_phone',
+            '_shipping_first_name',
+            '_shipping_last_name',
+            '_shipping_company',
+            '_shipping_address_1',
+            '_shipping_address_2',
+            '_shipping_city',
+            '_shipping_state',
+            '_shipping_postcode',
+            '_shipping_country',
+            '_completed_date',
+            '_paid_date',
+            '_edit_lock',
+            '_edit_last',
+            '_cart_discount',
+            '_cart_discount_tax',
+            '_order_shipping',
+            '_order_shipping_tax',
+            '_order_tax',
+            '_order_total',
+            '_payment_method',
+            '_payment_method_title',
+            '_transaction_id',
+            '_customer_ip_address',
+            '_customer_user_agent',
+            '_created_via',
+            '_order_version',
+            '_prices_include_tax',
+            '_date_completed',
+            '_date_paid',
+            '_payment_tokens',
+            '_billing_address_index',
+            '_shipping_address_index',
+            '_recorded_sales',
+            '_shipping_method',
+            '_order_currency',
+            '_cart_discount',
+            '_cart_discount_tax',
+            '_order_shipping',
+            '_order_shipping_tax',
+            '_order_tax',
+            '_order_total',
+            '_order_version',
+            '_prices_include_tax',
+            '_payment_tokens',
+        );
 
-		// format like wc api from 3.0+ does
-		$return = [];
-		foreach ( $metadata as $meta ) {
-			// skip if this is an ignored keys
-			if ( in_array( $meta->meta_key, $ignored_keys ) ) {
-				continue;
-			}
+        // format like wc api from 3.0+ does
+        $return = array();
+        foreach ($metadata as $meta) {
+            // skip if this is an ignored keys
+            if (in_array($meta->meta_key, $ignored_keys)) {
+                continue;
+            }
 
-			$return[] = array(
-				'id' => (int) $meta->meta_id,
-				'key' => $meta->meta_key,
-				'value' => maybe_unserialize( $meta->meta_value ),
-			);
-		}
+            $return[] = array(
+                'id'    => (int) $meta->meta_id,
+                'key'   => $meta->meta_key,
+                'value' => maybe_unserialize($meta->meta_value),
+            );
+        }
 
-		return $return;
-	}
+        return $return;
+    }
 }
 
 new Metorik_Helper_API_Subscriptions();
