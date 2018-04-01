@@ -1,2 +1,4 @@
-php: true
+php:
+  enabled:
+    - long_array_syntax
 js: true
