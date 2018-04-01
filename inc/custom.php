@@ -13,7 +13,7 @@ class Metorik_Custom
     /**
      * Possible fields.
      */
-    public $fields = [
+    public $fields = array(
         // main
         'type',
         'url',
@@ -32,7 +32,7 @@ class Metorik_Custom
         'session_start_time',
         'session_pages',
         'session_count',
-    ];
+    );
 
     /**
      * Field prefix (for the input field names).
@@ -41,16 +41,16 @@ class Metorik_Custom
 
     public function __construct()
     {
-        add_action('wp_enqueue_scripts', [$this, 'scripts']);
+        add_action('wp_enqueue_scripts', array($this, 'scripts'));
 
         // fields
-        add_action('woocommerce_after_order_notes', [$this, 'source_form_fields']);
-        add_action('woocommerce_register_form', [$this, 'source_form_fields']);
+        add_action('woocommerce_after_order_notes', array($this, 'source_form_fields'));
+        add_action('woocommerce_register_form', array($this, 'source_form_fields'));
 
         // update
-        add_action('woocommerce_checkout_update_order_meta', [$this, 'set_order_source']);
-        add_action('woocommerce_checkout_update_user_meta', [$this, 'set_customer_source']);
-        add_action('user_register', [$this, 'set_customer_source']);
+        add_action('woocommerce_checkout_update_order_meta', array($this, 'set_order_source'));
+        add_action('woocommerce_checkout_update_user_meta', array($this, 'set_customer_source'));
+        add_action('user_register', array($this, 'set_customer_source'));
     }
 
     /**
@@ -62,15 +62,15 @@ class Metorik_Custom
          * Enqueue sourcebuster and Metorik JS.
          */
         wp_enqueue_script('sourcebuster', plugins_url('assets/js/sourcebuster.min.js', dirname(__FILE__)), '', '1.1.0', true);
-        wp_enqueue_script('metorik-js', plugins_url('assets/js/metorik.js', dirname(__FILE__)), ['sourcebuster', 'jquery'], $this->version, true);
+        wp_enqueue_script('metorik-js', plugins_url('assets/js/metorik.js', dirname(__FILE__)), array('sourcebuster', 'jquery'), $this->version, true);
 
         /**
          * Pass parameters to Metorik JS.
          */
-        $params = [
+        $params = array(
             'lifetime' => (int) apply_filters('metorik_cookie_lifetime', 6), // 6 months
             'session'  => (int) apply_filters('metorik_session_length', 30), // 30 minutes
-        ];
+        );
         wp_localize_script('metorik-js', 'metorik_params', $params);
     }
 
@@ -111,7 +111,7 @@ class Metorik_Custom
         /**
          * Values.
          */
-        $values = [];
+        $values = array();
 
         /*
          * Get each field if POSTed.

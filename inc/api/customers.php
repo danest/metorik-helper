@@ -15,9 +15,9 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function __construct()
     {
-        add_action('rest_api_init', [$this, 'customers_ids_route']);
-        add_action('rest_api_init', [$this, 'customers_updated_route']);
-        add_action('rest_api_init', [$this, 'customers_roles_route']);
+        add_action('rest_api_init', array($this, 'customers_ids_route'));
+        add_action('rest_api_init', array($this, 'customers_updated_route'));
+        add_action('rest_api_init', array($this, 'customers_roles_route'));
 
         /*
          * Temporarily override WC core customers/customer endpoints to fix bug with customer last order
@@ -28,8 +28,8 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
          */
         if (get_option('metorik_importing_currently', false) && version_compare(WC()->version, '2.7.0', '<')) {
             $this->WC_REST_Customers_Controller = new WC_REST_Customers_Controller();
-            add_action('rest_api_init', [$this, 'customers_route']);
-            add_action('rest_api_init', [$this, 'single_customer_route']);
+            add_action('rest_api_init', array($this, 'customers_route'));
+            add_action('rest_api_init', array($this, 'single_customer_route'));
         }
     }
 
@@ -38,11 +38,11 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function customers_ids_route()
     {
-        register_rest_route($this->namespace, '/customers/ids/', [
+        register_rest_route($this->namespace, '/customers/ids/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'customers_ids_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'customers_ids_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -50,11 +50,11 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function customers_updated_route()
     {
-        register_rest_route($this->namespace, '/customers/updated/', [
+        register_rest_route($this->namespace, '/customers/updated/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'customers_updated_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'customers_updated_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -62,11 +62,11 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function customers_roles_route()
     {
-        register_rest_route($this->namespace, '/customers/roles/', [
+        register_rest_route($this->namespace, '/customers/roles/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'customers_roles_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'customers_roles_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -78,31 +78,31 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function customers_route()
     {
-        register_rest_route($this->namespace, '/customers/', [
-            [
+        register_rest_route($this->namespace, '/customers/', array(
+            array(
                 'methods'             => WP_REST_Server::READABLE,
-                'callback'            => [$this, 'customers_api_callback'],
-                'permission_callback' => [$this->WC_REST_Customers_Controller, 'get_items_permissions_check'],
+                'callback'            => array($this, 'customers_api_callback'),
+                'permission_callback' => array($this->WC_REST_Customers_Controller, 'get_items_permissions_check'),
                 'args'                => $this->WC_REST_Customers_Controller->get_collection_params(),
-            ],
-            [
+            ),
+            array(
                 'methods'             => WP_REST_Server::CREATABLE,
-                'callback'            => [$this->WC_REST_Customers_Controller, 'create_item'],
-                'permission_callback' => [$this->WC_REST_Customers_Controller, 'create_item_permissions_check'],
-                'args'                => array_merge($this->WC_REST_Customers_Controller->get_endpoint_args_for_item_schema(WP_REST_Server::CREATABLE), [
-                    'email' => [
+                'callback'            => array($this->WC_REST_Customers_Controller, 'create_item'),
+                'permission_callback' => array($this->WC_REST_Customers_Controller, 'create_item_permissions_check'),
+                'args'                => array_merge($this->WC_REST_Customers_Controller->get_endpoint_args_for_item_schema(WP_REST_Server::CREATABLE), array(
+                    'email' => array(
                         'required' => true,
-                    ],
-                    'username' => [
+                    ),
+                    'username' => array(
                         'required' => 'no' === get_option('woocommerce_registration_generate_username', 'yes'),
-                    ],
-                    'password' => [
+                    ),
+                    'password' => array(
                         'required' => 'no' === get_option('woocommerce_registration_generate_password', 'no'),
-                    ],
-                ]),
-            ],
-            'schema' => [$this->WC_REST_Customers_Controller, 'get_public_item_schema'],
-        ], true);
+                    ),
+                )),
+            ),
+            'schema' => array($this->WC_REST_Customers_Controller, 'get_public_item_schema'),
+        ), true);
     }
 
     /**
@@ -114,35 +114,35 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function single_customer_route()
     {
-        register_rest_route($this->namespace, '/customers/(?P<id>[\d]+)', [
-            [
+        register_rest_route($this->namespace, '/customers/(?P<id>[\d]+)', array(
+            array(
                 'methods'             => WP_REST_Server::READABLE,
-                'callback'            => [$this, 'get_item'],
-                'permission_callback' => [$this->WC_REST_Customers_Controller, 'get_item_permissions_check'],
-                'args'                => [
-                    'context' => $this->get_context_param(['default' => 'view']),
-                ],
-            ],
-            [
+                'callback'            => array($this, 'get_item'),
+                'permission_callback' => array($this->WC_REST_Customers_Controller, 'get_item_permissions_check'),
+                'args'                => array(
+                    'context' => $this->get_context_param(array('default' => 'view')),
+                ),
+            ),
+            array(
                 'methods'             => WP_REST_Server::EDITABLE,
-                'callback'            => [$this->WC_REST_Customers_Controller, 'update_item'],
-                'permission_callback' => [$this->WC_REST_Customers_Controller, 'update_item_permissions_check'],
+                'callback'            => array($this->WC_REST_Customers_Controller, 'update_item'),
+                'permission_callback' => array($this->WC_REST_Customers_Controller, 'update_item_permissions_check'),
                 'args'                => $this->get_endpoint_args_for_item_schema(WP_REST_Server::EDITABLE),
-            ],
-            [
+            ),
+            array(
                 'methods'             => WP_REST_Server::DELETABLE,
-                'callback'            => [$this->WC_REST_Customers_Controller, 'delete_item'],
-                'permission_callback' => [$this->WC_REST_Customers_Controller, 'delete_item_permissions_check'],
-                'args'                => [
-                    'force' => [
+                'callback'            => array($this->WC_REST_Customers_Controller, 'delete_item'),
+                'permission_callback' => array($this->WC_REST_Customers_Controller, 'delete_item_permissions_check'),
+                'args'                => array(
+                    'force' => array(
                         'default'     => false,
                         'description' => __('Required to be true, as resource does not support trashing.', 'woocommerce'),
-                    ],
-                    'reassign' => [],
-                ],
-            ],
-            'schema' => [$this->WC_REST_Customers_Controller, 'get_public_item_schema'],
-        ], true);
+                    ),
+                    'reassign' => array(),
+                ),
+            ),
+            'schema' => array($this->WC_REST_Customers_Controller, 'get_public_item_schema'),
+        ), true);
     }
 
     /**
@@ -178,7 +178,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
         /**
          * Just get IDs.
          */
-        $ids = [];
+        $ids = array();
         foreach ($customers as $customer) {
             if (isset($customer->user_id)) {
                 $ids[] = intval($customer->user_id);
@@ -188,10 +188,10 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'count' => count($ids),
             'ids'   => $ids,
-        ];
+        );
 
         /**
          * Response.
@@ -271,12 +271,12 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
 						AND b.meta_value > %d
 					WHERE a.meta_key = %s 
 					LIMIT %d, %d
-				", [
+				", array(
                     $time,
                     $cap_column,
                     $offset,
                     $limit,
-                ]
+                )
             ));
         } else {
             // Not multisite
@@ -289,20 +289,20 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
 					WHERE meta_key = 'last_update' 
 						AND meta_value > %d
 					LIMIT %d, %d
-				", [
+				", array(
                     $time,
                     $offset,
                     $limit,
-                ]
+                )
             ));
         }
 
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'customers' => $customers,
-        ];
+        );
 
         /**
          * Response.
@@ -325,7 +325,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
          * Format roles (we don't need all caps).
          */
         $editable_roles = get_editable_roles();
-        $roles = [];
+        $roles = array();
         foreach ($editable_roles as $key => $editable_role) {
             $roles[$key] = $editable_role['name'];
         }
@@ -333,9 +333,9 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'roles' => $roles,
-        ];
+        );
 
         /**
          * Response.
@@ -359,7 +359,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
         $customer = get_userdata($id);
 
         if (empty($id) || empty($customer->ID)) {
-            return new WP_Error('woocommerce_rest_invalid_id', __('Invalid resource id.', 'woocommerce'), ['status' => 404]);
+            return new WP_Error('woocommerce_rest_invalid_id', __('Invalid resource id.', 'woocommerce'), array('status' => 404));
         }
 
         $customer = $this->prepare_item_for_response($customer, $request);
@@ -377,7 +377,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function customers_api_callback($request)
     {
-        $prepared_args = [];
+        $prepared_args = array();
         $prepared_args['exclude'] = $request['exclude'];
         $prepared_args['include'] = $request['include'];
         $prepared_args['order'] = $request['order'];
@@ -387,12 +387,12 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
         } else {
             $prepared_args['offset'] = ($request['page'] - 1) * $prepared_args['number'];
         }
-        $orderby_possibles = [
+        $orderby_possibles = array(
             'id'              => 'ID',
             'include'         => 'include',
             'name'            => 'display_name',
             'registered_date' => 'registered',
-        ];
+        );
         $prepared_args['orderby'] = $orderby_possibles[$request['orderby']];
         $prepared_args['search'] = $request['search'];
 
@@ -403,7 +403,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
         // Filter by email.
         if (!empty($request['email'])) {
             $prepared_args['search'] = $request['email'];
-            $prepared_args['search_columns'] = ['user_email'];
+            $prepared_args['search_columns'] = array('user_email');
         }
 
         // Filter by role.
@@ -423,7 +423,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
 
         $query = new WP_User_Query($prepared_args);
 
-        $users = [];
+        $users = array();
         foreach ($query->results as $user) {
             $data = $this->prepare_item_for_response($user, $request);
             $users[] = $this->prepare_response_for_collection($data);
@@ -477,7 +477,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
      */
     public function prepare_item_for_response($customer, $request)
     {
-        $data = [
+        $data = array(
             'id'               => $customer->ID,
             'date_created'     => wc_rest_prepare_date_response($customer->user_registered),
             'date_modified'    => $customer->last_update ? wc_rest_prepare_date_response(date('Y-m-d H:i:s', $customer->last_update)) : null,
@@ -488,7 +488,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
             'orders_count'     => wc_get_customer_order_count($customer->ID),
             'total_spent'      => wc_get_customer_total_spent($customer->ID),
             'avatar_url'       => wc_get_customer_avatar_url($customer->customer_email),
-            'billing'          => [
+            'billing'          => array(
                 'first_name' => $customer->billing_first_name,
                 'last_name'  => $customer->billing_last_name,
                 'company'    => $customer->billing_company,
@@ -500,8 +500,8 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
                 'country'    => $customer->billing_country,
                 'email'      => $customer->billing_email,
                 'phone'      => $customer->billing_phone,
-            ],
-            'shipping'         => [
+            ),
+            'shipping'         => array(
                 'first_name' => $customer->shipping_first_name,
                 'last_name'  => $customer->shipping_last_name,
                 'company'    => $customer->shipping_company,
@@ -511,8 +511,8 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
                 'state'      => $customer->shipping_state,
                 'postcode'   => $customer->shipping_postcode,
                 'country'    => $customer->shipping_country,
-            ],
-        ];
+            ),
+        );
 
         $context = !empty($request['context']) ? $request['context'] : 'view';
         $data = $this->add_additional_fields_to_object($data, $request);
@@ -543,7 +543,7 @@ class Metorik_Helper_API_Customers extends WC_REST_Posts_Controller
     public function get_items_permissions_check($request)
     {
         if (!wc_rest_check_user_permissions('read')) {
-            return new WP_Error('woocommerce_rest_cannot_view', __('Sorry, you cannot list resources.', 'woocommerce'), ['status' => rest_authorization_required_code()]);
+            return new WP_Error('woocommerce_rest_cannot_view', __('Sorry, you cannot list resources.', 'woocommerce'), array('status' => rest_authorization_required_code()));
         }
 
         return true;

@@ -14,18 +14,18 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
      */
     public function __construct()
     {
-        add_action('rest_api_init', [$this, 'orders_ids_route']);
-        add_action('rest_api_init', [$this, 'orders_updated_route']);
-        add_action('rest_api_init', [$this, 'orders_statuses_route']);
+        add_action('rest_api_init', array($this, 'orders_ids_route'));
+        add_action('rest_api_init', array($this, 'orders_updated_route'));
+        add_action('rest_api_init', array($this, 'orders_statuses_route'));
 
         // if less than 2.7, add meta
         if (version_compare(WC()->version, '2.7.0', '<')) {
-            add_filter('woocommerce_rest_prepare_shop_order', [$this, 'add_order_api_data'], 10, 3);
+            add_filter('woocommerce_rest_prepare_shop_order', array($this, 'add_order_api_data'), 10, 3);
         }
 
         // if 3.0 or higher, remove coupon line items meta
         if (version_compare(WC()->version, '3.0.0', '>=')) {
-            add_filter('woocommerce_rest_prepare_shop_order_object', [$this, 'remove_coupon_line_items_meta'], 10, 3);
+            add_filter('woocommerce_rest_prepare_shop_order_object', array($this, 'remove_coupon_line_items_meta'), 10, 3);
         }
     }
 
@@ -34,11 +34,11 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
      */
     public function orders_ids_route()
     {
-        register_rest_route($this->namespace, '/orders/ids/', [
+        register_rest_route($this->namespace, '/orders/ids/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'orders_ids_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'orders_ids_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -46,11 +46,11 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
      */
     public function orders_updated_route()
     {
-        register_rest_route($this->namespace, '/orders/updated/', [
+        register_rest_route($this->namespace, '/orders/updated/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'orders_updated_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'orders_updated_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -58,11 +58,11 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
      */
     public function orders_statuses_route()
     {
-        register_rest_route($this->namespace, '/orders/statuses/', [
+        register_rest_route($this->namespace, '/orders/statuses/', array(
             'methods'             => WP_REST_Server::READABLE,
-            'callback'            => [$this, 'orders_statuses_callback'],
-            'permission_callback' => [$this, 'get_items_permissions_check'],
-        ]);
+            'callback'            => array($this, 'orders_statuses_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
     }
 
     /**
@@ -74,12 +74,12 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
         /**
          * Get orders.
          */
-        $orders = new WP_Query([
+        $orders = new WP_Query(array(
             'post_type'      => $this->post_type,
             'posts_per_page' => -1,
             'post_status'    => 'any',
             'fields'         => 'ids',
-        ]);
+        ));
 
         /*
          * No orders.
@@ -91,10 +91,10 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'count' => $orders->post_count,
             'ids'   => $orders->posts,
-        ];
+        );
 
         /**
          * Response.
@@ -166,19 +166,19 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
 					AND post_status != 'trash'
 					AND post_status != 'draft'
 				LIMIT %d, %d
-			", [
+			", array(
                 $from,
                 $offset,
                 $limit,
-            ]
+            )
         ));
 
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'orders' => $orders,
-        ];
+        );
 
         /**
          * Response.
@@ -197,9 +197,9 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
         /**
          * Prepare response.
          */
-        $data = [
+        $data = array(
             'statuses' => wc_get_order_statuses(),
-        ];
+        );
 
         /**
          * Response.
@@ -265,13 +265,13 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
 					meta_value
 				FROM $wpdb->postmeta
 				WHERE post_id = %d 
-			", [
+			", array(
                 $id,
-            ]
+            )
         ));
 
         // ignore some keys
-        $ignored_keys = [
+        $ignored_keys = array(
             '_customer_user',
             '_order_key',
             '_order_currency',
@@ -330,21 +330,21 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
             '_order_version',
             '_prices_include_tax',
             '_payment_tokens',
-        ];
+        );
 
         // format like 2.7 does
-        $return = [];
+        $return = array();
         foreach ($metadata as $meta) {
             // skip if this is an ignored keys
             if (in_array($meta->meta_key, $ignored_keys)) {
                 continue;
             }
 
-            $return[] = [
+            $return[] = array(
                 'id'    => (int) $meta->meta_id,
                 'key'   => $meta->meta_key,
                 'value' => maybe_unserialize($meta->meta_value),
-            ];
+            );
         }
 
         return $return;
