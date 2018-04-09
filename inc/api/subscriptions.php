@@ -172,7 +172,6 @@ class Metorik_Helper_API_Subscriptions extends WC_REST_Posts_Controller
     public function add_subscription_meta($response, $post, $request)
     {
         $data = $response->get_data();
-        $order = wc_get_order($post);
         $data['meta_data'] = $this->get_subscription_meta_data($post->ID);
         $response->set_data($data);
 

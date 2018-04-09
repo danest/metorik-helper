@@ -216,7 +216,6 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
     public function add_order_api_data($response, $post, $request)
     {
         $data = $response->get_data();
-        $order = wc_get_order($post);
         $data['meta_data'] = $this->get_order_post_meta($post->ID);
         $response->set_data($data);
 
