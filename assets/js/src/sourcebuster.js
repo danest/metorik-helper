@@ -5,7 +5,9 @@
         var f;
         'undefined' != typeof window
             ? (f = window)
-            : 'undefined' != typeof global ? (f = global) : 'undefined' != typeof self && (f = self),
+            : 'undefined' != typeof global
+                ? (f = global)
+                : 'undefined' != typeof self && (f = self),
             (f.sbjs = e());
     }
 })(function() {
