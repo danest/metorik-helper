@@ -14,6 +14,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
     {
         add_action('rest_api_init', array($this, 'metorik_info_route'));
         add_action('rest_api_init', array($this, 'metorik_importing_route'));
+        add_action('rest_api_init', array($this, 'metorik_auth_route'));
     }
 
     /**
@@ -36,6 +37,18 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
         register_rest_route($this->namespace, '/metorik/importing/', array(
             'methods'             => WP_REST_Server::EDITABLE,
             'callback'            => array($this, 'update_metorik_importing_callback'),
+            'permission_callback' => array($this, 'update_items_permissions_check'),
+        ));
+    }
+
+    /**
+     * Metorik auth store data route definition.
+     */
+    public function metorik_auth_route()
+    {
+        register_rest_route($this->namespace, '/metorik/auth/', array(
+            'methods'             => WP_REST_Server::EDITABLE,
+            'callback'            => array($this, 'update_metorik_auth_callback'),
             'permission_callback' => array($this, 'update_items_permissions_check'),
         ));
     }
@@ -124,6 +137,46 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
         $data = array(
             'updated' => true,
             'status'  => get_option('metorik_importing_currently'),
+        );
+
+        /**
+         * Response.
+         */
+        $response = rest_ensure_response($data);
+        $response->set_status(200);
+
+        return $response;
+    }
+
+    /**
+     * Callback.
+     */
+    public function update_metorik_auth_callback($request)
+    {
+        /*
+         * Check token set.
+         */
+        if (! isset($request['token'])) {
+            return new WP_Error('woocommerce_rest_metorik_invalid_auth_token', __('Invalid token.', 'woocommerce'), array('status' => 400));
+        }
+
+        /**
+         * Get and sanitize token.
+         */
+        $token = $request['token'] ? true : false;
+
+        /*
+         * Update token.
+         */
+        update_option('metorik_auth_token', $token);
+
+        /**
+         * Prepare response.
+         */
+        $data = array(
+            'updated' => true,
+            // ?
+            'token'  => get_option('metorik_auth_token'),
         );
 
         /**
