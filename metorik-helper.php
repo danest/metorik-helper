@@ -68,6 +68,7 @@ class Metorik_Helper
             require_once 'inc/api.php';
             require_once 'inc/ui.php';
             require_once 'inc/custom.php';
+            require_once 'inc/carts.php';
         } else {
             add_action('admin_notices', array($this, 'no_wc'));
         }

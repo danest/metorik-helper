@@ -44,4 +44,48 @@
     if ($('.woocommerce form.register').length) {
         setFields();
     }
+
+    /**
+     * Send cart data.
+     * @todo Only if cart token set up.
+     */
+    var sendCartData = function () {
+        var email = isValidEmail($('#billing_email').val()) ? $('#billing_email').val() : null;
+
+        var data = {
+            'action': 'metorik_send_cart',
+            'security': metorik_params.nonce,
+            'email': email
+        };
+
+        $.post(ajaxurl, data, function (response) {
+            //
+        });
+    }
+
+    var isValidEmail = function(email) {
+        return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
+    }
+
+    /**
+     * Listen for events then send cart data.
+     */
+    $(document.body).on('added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout', function(event) {
+        sendCartData();
+    });
+
+    /**
+     * Watch for email input changes.
+     */
+    var timer;
+    $('#billing_email').bind('blur', function(e) {
+        var _this = $(this);
+        
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            if (isValidEmail(_this.val())) {
+                sendCartData();
+            }
+        }, 500);
+    });
 })(jQuery);
