@@ -165,7 +165,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
          */
         $token = $request['token'] ? sanitize_text_field($request['token']) : false;
 
-        /**
+        /*
          * Update token.
          */
         update_option('metorik_auth_token', $token);
