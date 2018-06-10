@@ -156,7 +156,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
         /*
          * Check token set.
          */
-        if (! isset($request['token'])) {
+        if (!isset($request['token'])) {
             return new WP_Error('woocommerce_rest_metorik_invalid_auth_token', __('Invalid token.', 'woocommerce'), array('status' => 400));
         }
 
