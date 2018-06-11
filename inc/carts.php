@@ -314,6 +314,9 @@ class Metorik_Helper_Carts
         // need to cast all to an array for putting back into the session
         $cart = json_decode(json_encode($cart), true);
 
+        // Clear any existing cart
+        WC()->cart->empty_cart();
+
         // Restore cart
         WC()->session->set( 'cart', $cart );
         
