@@ -13,9 +13,10 @@ class Metorik_Helper_Carts
      */
     public function __construct()
     {
-        // AJAX cart sending
+        // Cart sending (ajax/actions)
         add_action('wp_ajax_nopriv_metorik_send_cart', array($this, 'ajax_send_cart'));
         add_action('wp_ajax_metorik_send_cart', array($this, 'ajax_send_cart'));
+        add_action( 'woocommerce_cart_item_removed', array($this, 'check_cart_empty_and_send') );
 
         // Checkout
         add_action('woocommerce_checkout_order_processed', array($this, 'checkout_order_processed'));
@@ -116,14 +117,14 @@ class Metorik_Helper_Carts
     {
         check_ajax_referer('metorik-js', 'security');
 
+        // metorik auth token? if none, stop
         $metorik_auth_token = get_option('metorik_auth_token');
-        $cart = WC()->cart->get_cart();
-
-        // no metorik auth token or cart? stop
-        if (!$metorik_auth_token || !$cart) {
+        if (!$metorik_auth_token) {
             return;
         }
 
+        // variables
+        $cart = WC()->cart->get_cart();
         $token = $this->get_or_set_cart_token();
         $customer_id = get_current_user_id();
         $email = isset($_POST['email']) && $_POST['email'] ? sanitize_email($_POST['email']) : null;
@@ -150,6 +151,40 @@ class Metorik_Helper_Carts
         ));
 
         wp_die();
+    }
+
+    /**
+     * Hooks into a cart item being removed action.
+     * Checks if the cart is empty. If so, sends the
+     * empty cart to Metorik (and clears token).
+     *
+     * @return void
+     */
+    public function check_cart_empty_and_send() {
+        // only continue if the cart is empty
+		if ( WC()->cart->is_empty() ) {
+            // metorik auth token? if none, stop
+            $metorik_auth_token = get_option('metorik_auth_token');
+            if (!$metorik_auth_token) {
+                return;
+            }
+
+            // clear cart remotely by sending empty cart
+            $token = $this->get_or_set_cart_token();
+            
+            $response = wp_remote_post($this->apiUrl.'/incoming/carts', array(
+                'body' =>  array(
+                    'api_token' => $metorik_auth_token,
+                    'data'      => array(
+                        'token'             => $token,
+                        'cart'              => false,
+                    ),
+                ),
+            ));
+
+            // clear the cart token/data from the session/user
+			$this->unset_cart_token();
+		}
     }
 
     /**
@@ -350,12 +385,14 @@ class Metorik_Helper_Carts
         // Restore cart
         WC()->session->set('cart', $cart);
 
-        // Set the cart token and pending recovery in session (token should already be set in user meta)
+        // Set the cart token and pending recovery in session
         WC()->session->set('metorik_cart_token', $cart_token);
         WC()->session->set('metorik_pending_recovery', true);
 
-        $user_id = get_current_user_id();
+        // Set the cart token / pending recovery in user meta if this cart has a user
+        $user_id = $body->data->customer_id;
         if ($user_id) {
+            update_user_meta($user_id, '_metorik_cart_token', $cart_token);
             update_user_meta($user_id, '_metorik_pending_recovery', true);
         }
     }
