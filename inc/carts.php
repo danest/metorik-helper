@@ -16,7 +16,7 @@ class Metorik_Helper_Carts
         // Cart sending (ajax/actions)
         add_action('wp_ajax_nopriv_metorik_send_cart', array($this, 'ajax_send_cart'));
         add_action('wp_ajax_metorik_send_cart', array($this, 'ajax_send_cart'));
-        add_action( 'woocommerce_cart_item_removed', array($this, 'check_cart_empty_and_send') );
+        add_action('woocommerce_cart_item_removed', array($this, 'check_cart_empty_and_send'));
 
         // Checkout
         add_action('woocommerce_checkout_order_processed', array($this, 'checkout_order_processed'));
@@ -160,9 +160,10 @@ class Metorik_Helper_Carts
      *
      * @return void
      */
-    public function check_cart_empty_and_send() {
+    public function check_cart_empty_and_send()
+    {
         // only continue if the cart is empty
-		if ( WC()->cart->is_empty() ) {
+        if (WC()->cart->is_empty()) {
             // metorik auth token? if none, stop
             $metorik_auth_token = get_option('metorik_auth_token');
             if (!$metorik_auth_token) {
@@ -171,9 +172,9 @@ class Metorik_Helper_Carts
 
             // clear cart remotely by sending empty cart
             $token = $this->get_or_set_cart_token();
-            
+
             $response = wp_remote_post($this->apiUrl.'/incoming/carts', array(
-                'body' =>  array(
+                'body' => array(
                     'api_token' => $metorik_auth_token,
                     'data'      => array(
                         'token'             => $token,
@@ -183,8 +184,8 @@ class Metorik_Helper_Carts
             ));
 
             // clear the cart token/data from the session/user
-			$this->unset_cart_token();
-		}
+            $this->unset_cart_token();
+        }
     }
 
     /**
