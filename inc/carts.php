@@ -24,8 +24,9 @@ class Metorik_Helper_Carts
         add_action('woocommerce_payment_complete', array($this, 'unset_cart_token'));
         add_action('woocommerce_thankyou', array($this, 'unset_cart_token'));
 
-        // API route for cart recovery
+        // Cart recovery
         add_action('rest_api_init', array($this, 'api_recover_cart_route'));
+        add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'maybe_apply_cart_recovery_coupon' ), 11 );
     }
 
     public function generate_cart_token()
@@ -232,6 +233,21 @@ class Metorik_Helper_Carts
 
         $order->add_order_note(__('Order cart recovered by Metorik.', 'metorik'));
     }
+
+	/**
+	 * Maybe apply the recovery coupon provided in the recovery URL.
+	 *
+	 * @since 1.1.0
+	 */
+	public function maybe_apply_cart_recovery_coupon() {
+		if ( $this->cart_is_pending_recovery() && ! empty( $_REQUEST['coupon'] ) ) {
+			$coupon_code = wc_clean( rawurldecode( $_REQUEST['coupon'] ) );
+
+			if ( ! WC()->cart->has_discount( $coupon_code ) ) {
+				WC()->cart->add_discount( $coupon_code );
+			}
+		}
+	}
 
     /**
      * Rest API route for recovering a cart.
