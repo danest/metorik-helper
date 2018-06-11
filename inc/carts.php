@@ -18,51 +18,56 @@ class Metorik_Helper_Carts
         add_action('wp_ajax_metorik_send_cart', array($this, 'ajax_send_cart'));
 
         // Checkout
-        add_action( 'woocommerce_checkout_order_processed', array( $this, 'checkout_order_processed' ) );
+        add_action('woocommerce_checkout_order_processed', array($this, 'checkout_order_processed'));
 
         // Unset cart
-		add_action( 'woocommerce_payment_complete', array( $this, 'unset_cart_token' ) );
-        add_action( 'woocommerce_thankyou', array( $this, 'unset_cart_token' ) );
-        
+        add_action('woocommerce_payment_complete', array($this, 'unset_cart_token'));
+        add_action('woocommerce_thankyou', array($this, 'unset_cart_token'));
+
         // API route for cart recovery
         add_action('rest_api_init', array($this, 'api_recover_cart_route'));
     }
 
-    public function generate_cart_token() {
+    public function generate_cart_token()
+    {
         $token = md5(time());
+
         return $token;
     }
 
-    public function get_or_set_cart_token() {  
-        if (! $token = $this->get_cart_token()) {
+    public function get_or_set_cart_token()
+    {
+        if (!$token = $this->get_cart_token()) {
             $token = $this->set_cart_token();
         }
 
         return $token;
     }
 
-    public function get_cart_token($user_id = false) {
-		if ( $user_id || ( $user_id = get_current_user_id() ) ) {
-            $token = get_user_meta( $user_id, '_metorik_cart_token', true );;
+    public function get_cart_token($user_id = false)
+    {
+        if ($user_id || ($user_id = get_current_user_id())) {
+            $token = get_user_meta($user_id, '_metorik_cart_token', true);
 
             // if no user meta token, check session cart token first and use that
-            if (! $token && WC()->session && WC()->session->get('metorik_cart_token')) {
-			    update_user_meta( $user_id, '_metorik_cart_token', $token );
+            if (!$token && WC()->session && WC()->session->get('metorik_cart_token')) {
+                update_user_meta($user_id, '_metorik_cart_token', $token);
             }
 
-			return $token;
-		} else {
-			return ( WC()->session ) ? WC()->session->get( 'metorik_cart_token' ) : '';
-		}
+            return $token;
+        } else {
+            return (WC()->session) ? WC()->session->get('metorik_cart_token') : '';
+        }
     }
 
-    public function set_cart_token() {
+    public function set_cart_token()
+    {
         $token = $this->generate_cart_token();
 
-		WC()->session->set( 'metorik_cart_token', $token );
+        WC()->session->set('metorik_cart_token', $token);
 
-		if ( $user_id = get_current_user_id() ) {
-			update_user_meta( $user_id, '_metorik_cart_token', $token );
+        if ($user_id = get_current_user_id()) {
+            update_user_meta($user_id, '_metorik_cart_token', $token);
         }
 
         return $token;
@@ -72,31 +77,33 @@ class Metorik_Helper_Carts
      * Unset a cart token/recovery status.
      * Done when checking out after payment.
      */
-    public function unset_cart_token() {
-		if ( WC()->session ) {
-			unset( WC()->session->metorik_cart_token, WC()->session->metorik_pending_recovery );
-		}
+    public function unset_cart_token()
+    {
+        if (WC()->session) {
+            unset(WC()->session->metorik_cart_token, WC()->session->metorik_pending_recovery);
+        }
 
-		if ( $user_id = get_current_user_id() ) {
-            delete_user_meta( $user_id, '_metorik_cart_token' );
-            delete_user_meta( $user_id, '_metorik_pending_recovery' );
-		}
+        if ($user_id = get_current_user_id()) {
+            delete_user_meta($user_id, '_metorik_cart_token');
+            delete_user_meta($user_id, '_metorik_pending_recovery');
+        }
     }
 
-	/**
-	 * Was the current cart/checkout created by a Metorik recovery URL?
-	 * @return bool
-	 */
-	public static function cart_is_pending_recovery( $user_id = null ) {
+    /**
+     * Was the current cart/checkout created by a Metorik recovery URL?
+     *
+     * @return bool
+     */
+    public static function cart_is_pending_recovery($user_id = null)
+    {
+        if ($user_id || ($user_id = get_current_user_id())) {
+            return (bool) get_user_meta($user_id, '_metorik_pending_recovery', true);
+        } elseif (isset(WC()->session)) {
+            return (bool) WC()->session->metorik_pending_recovery;
+        }
 
-		if ( $user_id || ( $user_id = get_current_user_id() ) ) {
-			return (bool) get_user_meta( $user_id, '_metorik_pending_recovery', true );
-		} elseif ( isset( WC()->session ) ) {
-			return (bool) WC()->session->metorik_pending_recovery;
-		}
-
-		return false;
-	}
+        return false;
+    }
 
     /**
      * Send cart ajax. Only if have cart!
@@ -106,13 +113,13 @@ class Metorik_Helper_Carts
      */
     public function ajax_send_cart()
     {
-        check_ajax_referer( 'metorik-js', 'security' );
+        check_ajax_referer('metorik-js', 'security');
 
         $metorik_auth_token = get_option('metorik_auth_token');
         $cart = WC()->cart->get_cart();
 
         // no metorik auth token or cart? stop
-        if (! $metorik_auth_token || ! $cart) {
+        if (!$metorik_auth_token || !$cart) {
             return;
         }
 
@@ -122,105 +129,108 @@ class Metorik_Helper_Carts
 
         $data = array(
             'api_token' => $metorik_auth_token,
-            'data' => array(
-                'token' => $token,
-                'cart' => $cart,
-                'started_at' => current_time('timestamp', true), // utc timestamp
-                'total' => (float) $this->get_cart_total(),
-                'subtotal'    => (float) $this->get_cart_subtotal(),
+            'data'      => array(
+                'token'             => $token,
+                'cart'              => $cart,
+                'started_at'        => current_time('timestamp', true), // utc timestamp
+                'total'             => (float) $this->get_cart_total(),
+                'subtotal'          => (float) $this->get_cart_subtotal(),
                 'total_tax'         => (float) (WC()->cart->tax_total + WC()->cart->shipping_tax_total),
-                'total_discount'   => (float) WC()->cart->discount_cart,
+                'total_discount'    => (float) WC()->cart->discount_cart,
                 'total_shipping'    => (float) WC()->cart->shipping_total,
-                'currency' => get_woocommerce_currency(),
-                'customer_id' => $customer_id,
-                'email' => $email,
+                'currency'          => get_woocommerce_currency(),
+                'customer_id'       => $customer_id,
+                'email'             => $email,
             ),
         );
-        
-        $response = wp_remote_post( $this->apiUrl . '/incoming/carts', array(
+
+        $response = wp_remote_post($this->apiUrl.'/incoming/carts', array(
             'body' => $data,
-        ) );
+        ));
 
         wp_die();
     }
 
-	/**
-	 * Cart total.
+    /**
+     * Cart total.
      * Since WC won't calculate total unless on cart/checkout,
      * we need an alternative method to do it manually.
-	 */
-	protected function get_cart_total() {
-		if (
+     */
+    protected function get_cart_total()
+    {
+        if (
             is_checkout() ||
             is_cart() ||
-            defined( 'WOOCOMMERCE_CHECKOUT' ) ||
-            defined( 'WOOCOMMERCE_CART' )
+            defined('WOOCOMMERCE_CHECKOUT') ||
+            defined('WOOCOMMERCE_CART')
         ) {
-			return WC()->cart->total;
-		} else {
-			// product page, etc. - total not calculated but tax/shipping maybe
-            return WC()->cart->subtotal_ex_tax + 
-                WC()->cart->tax_total + 
-                WC()->cart->shipping_tax_total + 
+            return WC()->cart->total;
+        } else {
+            // product page, etc. - total not calculated but tax/shipping maybe
+            return WC()->cart->subtotal_ex_tax +
+                WC()->cart->tax_total +
+                WC()->cart->shipping_tax_total +
                 WC()->cart->shipping_total;
-		}
-    }
-    
-	/**
-	 * Get the cart subtotal (maybe inclusive of taxes).
-	 */
-	public function get_cart_subtotal() {
-		if ( 'excl' === get_option( 'woocommerce_tax_display_cart' ) ) {
-			$subtotal = WC()->cart->subtotal_ex_tax;
-		} else {
-			$subtotal = WC()->cart->subtotal;
         }
-        
+    }
+
+    /**
+     * Get the cart subtotal (maybe inclusive of taxes).
+     */
+    public function get_cart_subtotal()
+    {
+        if ('excl' === get_option('woocommerce_tax_display_cart')) {
+            $subtotal = WC()->cart->subtotal_ex_tax;
+        } else {
+            $subtotal = WC()->cart->subtotal;
+        }
+
         return $subtotal;
     }
-    
+
     /**
-	 * This is called once the checkout has been processed and an order has been created.
-	 */
-	public function checkout_order_processed( $order_id ) {
+     * This is called once the checkout has been processed and an order has been created.
+     */
+    public function checkout_order_processed($order_id)
+    {
         // no metorik auth token? Stop
         $metorik_auth_token = get_option('metorik_auth_token');
-        if (! $metorik_auth_token) {
+        if (!$metorik_auth_token) {
             return;
-        }        
+        }
 
-		$cart_token = $this->get_cart_token();
+        $cart_token = $this->get_cart_token();
 
-		// generate a token if needed? not sure if needed/possible to send cart now
-		if ( ! $cart_token ) {
+        // generate a token if needed? not sure if needed/possible to send cart now
+        if (!$cart_token) {
             //
-		}
+        }
 
         // save cart token to order meta
         if ($cart_token) {
-            update_post_meta( $order_id, '_metorik_cart_token', $cart_token );
+            update_post_meta($order_id, '_metorik_cart_token', $cart_token);
         }
 
         // check if pending recovery - if so, set in order meta
         if ($this->cart_is_pending_recovery()) {
-            $this->mark_order_as_recovered( $order_id );
+            $this->mark_order_as_recovered($order_id);
         }
     }
 
-	/**
-	 * Mark an order as recovered by Metorik.
-	 */
-	public function mark_order_as_recovered( $order_id ) {
+    /**
+     * Mark an order as recovered by Metorik.
+     */
+    public function mark_order_as_recovered($order_id)
+    {
+        $order = wc_get_order($order_id);
 
-		$order = wc_get_order( $order_id );
+        if (!$order instanceof WC_Order) {
+            return;
+        }
 
-		if ( ! $order instanceof WC_Order ) {
-			return;
-		}
+        update_post_meta($order_id, '_metorik_cart_recovered', true);
 
-		update_post_meta( $order_id, '_metorik_cart_recovered', true );
-
-        $order->add_order_note( __( 'Order cart recovered by Metorik.', 'metorik' ) );
+        $order->add_order_note(__('Order cart recovered by Metorik.', 'metorik'));
     }
 
     /**
@@ -228,26 +238,28 @@ class Metorik_Helper_Carts
      *
      * @return void
      */
-    public function api_recover_cart_route() {
-        register_rest_route( 'metorik/v1', '/recover-cart', array(
-            'methods' => 'GET',
+    public function api_recover_cart_route()
+    {
+        register_rest_route('metorik/v1', '/recover-cart', array(
+            'methods'  => 'GET',
             'callback' => array($this, 'recover_cart_callback'),
-        ) );
+        ));
     }
 
     /**
      * API route callback for recovering a cart.
      */
-    public function recover_cart_callback($request) {
+    public function recover_cart_callback($request)
+    {
         // Check token is set and has a value before continuing.
         if (isset($request['token']) && $cart_token = $request['token']) {
             // base checkout url
             $checkout_url = wc_get_checkout_url();
 
             // forward along any UTM or metorik params
-            foreach ( $request as $key => $val ) {
-                if ( 0 === strpos( $key, 'utm_' ) || 0 === strpos( $key, 'mtk' ) ) {
-                    $checkout_url = add_query_arg( $key, $val, $checkout_url );
+            foreach ($request as $key => $val) {
+                if (0 === strpos($key, 'utm_') || 0 === strpos($key, 'mtk')) {
+                    $checkout_url = add_query_arg($key, $val, $checkout_url);
                 }
             }
 
@@ -256,21 +268,21 @@ class Metorik_Helper_Carts
                 $this->restore_cart($cart_token);
 
                 // check for coupon in recovery URL to apply before checkout redirect
-                if ( isset( $request['coupon'] ) && $coupon = rawurldecode( $request['coupon'] ) ) {
-                    $checkout_url = add_query_arg( array( 'coupon' => wc_clean( $coupon ) ), $checkout_url );
+                if (isset($request['coupon']) && $coupon = rawurldecode($request['coupon'])) {
+                    $checkout_url = add_query_arg(array('coupon' => wc_clean($coupon)), $checkout_url);
                 }
-            } catch ( Exception $e ) {
+            } catch (Exception $e) {
                 // no session? start so notices will be shown
-                if ( ! WC()->session->has_session() ) {
-                    WC()->session->set_customer_session_cookie( true );
+                if (!WC()->session->has_session()) {
+                    WC()->session->set_customer_session_cookie(true);
                 }
 
                 // add a notice
-                wc_add_notice( __( "Sorry, we were not able to restore your cart. Please try adding your items to your cart again.", "metorik" ), 'error' );
+                wc_add_notice(__('Sorry, we were not able to restore your cart. Please try adding your items to your cart again.', 'metorik'), 'error');
             }
-            
+
             // redirect checkout url
-            wp_safe_redirect( $checkout_url );
+            wp_safe_redirect($checkout_url);
             exit;
         }
     }
@@ -278,31 +290,32 @@ class Metorik_Helper_Carts
     /**
      * Restore an actual cart.
      */
-    public function restore_cart($cart_token) {
+    public function restore_cart($cart_token)
+    {
         // metorik auth token
         $metorik_auth_token = get_option('metorik_auth_token');
-        if (! $metorik_auth_token) {
-            throw new Exception( 'Missing Metorik authentication token' );
+        if (!$metorik_auth_token) {
+            throw new Exception('Missing Metorik authentication token');
         }
 
         // get cart
-        $response = wp_remote_get($this->apiUrl . '/external/carts', array(
+        $response = wp_remote_get($this->apiUrl.'/external/carts', array(
             'body' => array(
-                'api_token' => $metorik_auth_token,
+                'api_token'  => $metorik_auth_token,
                 'cart_token' => $cart_token,
             ),
         ));
 
         // Error during response?
-        if ( is_wp_error( $response ) ) {
-            throw new Exception( 'Error getting cart from Metorik' );
+        if (is_wp_error($response)) {
+            throw new Exception('Error getting cart from Metorik');
         }
 
-        $body = wp_remote_retrieve_body( $response );
+        $body = wp_remote_retrieve_body($response);
 
         // no response body/cart?
-        if (! $body) {
-            throw new Exception( 'Error getting cart from Metorik' );
+        if (!$body) {
+            throw new Exception('Error getting cart from Metorik');
         }
 
         // json decode
@@ -318,15 +331,15 @@ class Metorik_Helper_Carts
         WC()->cart->empty_cart();
 
         // Restore cart
-        WC()->session->set( 'cart', $cart );
-        
+        WC()->session->set('cart', $cart);
+
         // Set the cart token and pending recovery in session (token should already be set in user meta)
-        WC()->session->set( 'metorik_cart_token', $cart_token );
-        WC()->session->set( 'metorik_pending_recovery', true );
+        WC()->session->set('metorik_cart_token', $cart_token);
+        WC()->session->set('metorik_pending_recovery', true);
 
         $user_id = get_current_user_id();
         if ($user_id) {
-            update_user_meta( $user_id, '_metorik_pending_recovery', true );
+            update_user_meta($user_id, '_metorik_pending_recovery', true);
         }
     }
 }
