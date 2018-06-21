@@ -194,7 +194,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
          */
         $data = array(
             'updated' => true,
-            'token'  => get_option('metorik_auth_token'),
+            'token'   => get_option('metorik_auth_token'),
         );
 
         /**
@@ -258,7 +258,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
          * Prepare response.
          */
         $data = array(
-            'updated' => true,
+            'updated'   => true,
             'settings'  => get_option('metorik_cart_settings'),
         );
 

@@ -72,7 +72,7 @@
 
         /**
          * Function to check if an email is valid.
-         * @param {*} email 
+         * @param {*} email
          */
         var isValidEmail = function(email) {
             return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
@@ -121,7 +121,7 @@
                     /**
                      * Only show if add to cart seen not true.
                      */
-                    if (! addToCartSeen) {
+                    if (!addToCartSeen) {
                         show();
                     }
                 },
@@ -130,7 +130,7 @@
                      * Set the add to cart fomr as having been senen so it doesn't get shown again.
                      */
                     addToCartSeen = true;
-                    
+
                     /**
                      * Make an AJAX request to set the add cart form as 'seen'.
                      */
@@ -139,10 +139,10 @@
                         security: metorik_params.nonce,
                     };
 
-                    $.post(ajaxurl, data, function (response) {
+                    $.post(ajaxurl, data, function(response) {
                         //
                     });
-                }
+                },
             });
         }
 
@@ -157,7 +157,7 @@
             _wrapper.removeClass('success');
 
             clearTimeout(timer);
-            timer = setTimeout(function () {
+            timer = setTimeout(function() {
                 if (isValidEmail(_this.val())) {
                     _wrapper.addClass('success');
                     sendCartData(_this.val());
@@ -172,14 +172,14 @@
             e.preventDefault();
 
             // loading
-            $('.metorik-email-usage-notice').css({'opacity' : '0.5', 'pointer-events' : 'none'});
-            
+            $('.metorik-email-usage-notice').css({ opacity: '0.5', 'pointer-events': 'none' });
+
             var data = {
                 action: 'metorik_email_opt_out',
-                security: metorik_params.nonce
+                security: metorik_params.nonce,
             };
 
-            $.post(ajaxurl, data, function (response) {
+            $.post(ajaxurl, data, function(response) {
                 // hide email usage notice
                 $('.metorik-email-usage-notice').css('display', 'none');
 
