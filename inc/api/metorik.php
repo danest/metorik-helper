@@ -15,6 +15,7 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
         add_action('rest_api_init', array($this, 'metorik_info_route'));
         add_action('rest_api_init', array($this, 'metorik_importing_route'));
         add_action('rest_api_init', array($this, 'metorik_auth_route'));
+        add_action('rest_api_init', array($this, 'metorik_cart_settings_routes'));
     }
 
     /**
@@ -49,6 +50,24 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
         register_rest_route($this->namespace, '/metorik/auth/', array(
             'methods'             => WP_REST_Server::EDITABLE,
             'callback'            => array($this, 'update_metorik_auth_callback'),
+            'permission_callback' => array($this, 'update_items_permissions_check'),
+        ));
+    }
+
+    /**
+     * Metorik cart settings routes (GET AND PUT).
+     */
+    public function metorik_cart_settings_routes()
+    {
+        register_rest_route($this->namespace, '/metorik/cart-settings/', array(
+            'methods'             => WP_REST_Server::READABLE,
+            'callback'            => array($this, 'get_metorik_cart_settings_callback'),
+            'permission_callback' => array($this, 'get_items_permissions_check'),
+        ));
+
+        register_rest_route($this->namespace, '/metorik/cart-settings/', array(
+            'methods'             => WP_REST_Server::EDITABLE,
+            'callback'            => array($this, 'update_metorik_cart_settings_callback'),
             'permission_callback' => array($this, 'update_items_permissions_check'),
         ));
     }
@@ -175,8 +194,72 @@ class Metorik_Helper_API_Metorik extends WC_REST_Posts_Controller
          */
         $data = array(
             'updated' => true,
-            // ?
             'token'  => get_option('metorik_auth_token'),
+        );
+
+        /**
+         * Response.
+         */
+        $response = rest_ensure_response($data);
+        $response->set_status(200);
+
+        return $response;
+    }
+
+    /**
+     * Callback.
+     */
+    public function get_metorik_cart_settings_callback($request)
+    {
+        /*
+         * Get settings.
+         */
+        $settings = get_option('metorik_cart_settings');
+
+        /**
+         * Prepare response.
+         */
+        $data = array(
+            'settings'  => $settings,
+        );
+
+        /**
+         * Response.
+         */
+        $response = rest_ensure_response($data);
+        $response->set_status(200);
+
+        return $response;
+    }
+
+    /**
+     * Callback.
+     */
+    public function update_metorik_cart_settings_callback($request)
+    {
+        /*
+         * Check settings set.
+         */
+        if (!isset($request['settings'])) {
+            return new WP_Error('woocommerce_rest_metorik_missing_cart_settings', __('Missing settings.', 'woocommerce'), array('status' => 400));
+        }
+
+        /**
+         * Get, json encode, and sanitize settings.
+         */
+        $settings = sanitize_text_field(json_encode($request['settings']));
+
+        /*
+         * Update settings.
+         */
+        update_option('metorik_cart_settings', $settings);
+
+        /**
+         * Prepare response.
+         */
+        $data = array(
+            'updated' => true,
+            'settings'  => get_option('metorik_cart_settings'),
         );
 
         /**
