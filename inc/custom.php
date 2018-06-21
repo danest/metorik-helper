@@ -41,7 +41,7 @@ class Metorik_Custom
 
     public function __construct()
     {
-        add_action('wp_enqueue_scripts', array($this, 'scripts'));
+        add_action('wp_enqueue_scripts', array($this, 'scripts_styles'));
 
         // fields
         add_action('woocommerce_after_order_notes', array($this, 'source_form_fields'));
@@ -54,23 +54,30 @@ class Metorik_Custom
     }
 
     /**
-     * Scripts for Metorik's custom source tracking.
+     * Scripts & styles for Metorik's custom source tracking and cart tracking.
      */
-    public function scripts()
+    public function scripts_styles()
     {
         /*
-         * Enqueue sourcebuster and Metorik JS.
+         * Enqueue scripts.
          */
         wp_enqueue_script('sourcebuster', plugins_url('assets/js/sourcebuster.min.js', dirname(__FILE__)), '', '1.1.0', true);
-        wp_enqueue_script('metorik-js', plugins_url('assets/js/metorik.js', dirname(__FILE__)), array('sourcebuster', 'jquery'), $this->version, true);
+        wp_enqueue_script('tippy', plugins_url('assets/js/tippy.min.js', dirname(__FILE__)), '', '2.5.2', true);
+        wp_enqueue_script('metorik-js', plugins_url('assets/js/metorik.js', dirname(__FILE__)), array('sourcebuster', 'tippy', 'jquery'), $this->version, true);
+
+        /**
+         * Enqueue styles.
+         */
+        wp_enqueue_style( 'metorik-css', plugins_url('assets/css/metorik.css', dirname(__FILE__)), '', $this->version);
 
         /**
          * Pass parameters to Metorik JS.
          */
         $params = array(
-            'lifetime' => (int) apply_filters('metorik_cookie_lifetime', 6), // 6 months
-            'session'  => (int) apply_filters('metorik_session_length', 30), // 30 minutes
-            'nonce'    => wp_create_nonce('metorik-js'),
+            'lifetime'      => (int) apply_filters('metorik_cookie_lifetime', 6), // 6 months
+            'session'       => (int) apply_filters('metorik_session_length', 30), // 30 minutes
+            'nonce'         => wp_create_nonce('metorik-js'),
+            'cart_tracking' => get_option('metorik_auth_token') ? true : false,
         );
         wp_localize_script('metorik-js', 'metorik_params', $params);
     }
