@@ -11,12 +11,14 @@ class Metorik_Helper_Carts
     /**
      * Constructor.
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Cart sending (ajax/actions)
         add_action('wp_ajax_nopriv_metorik_send_cart', array($this, 'ajax_send_cart'));
         add_action('wp_ajax_metorik_send_cart', array($this, 'ajax_send_cart'));
         add_action('woocommerce_cart_item_removed', array($this, 'check_cart_empty_and_send'));
+
+        // Customer login - link existing cart token to user account
+        add_action('wp_login', array($this, 'link_customer_existing_cart'), 10, 2);
 
         // Checkout
         add_action('woocommerce_checkout_order_processed', array($this, 'checkout_order_processed'));
@@ -28,17 +30,37 @@ class Metorik_Helper_Carts
         // Cart recovery
         add_action('rest_api_init', array($this, 'api_recover_cart_route'));
         add_action('woocommerce_cart_loaded_from_session', array($this, 'maybe_apply_cart_recovery_coupon'), 11);
+
+        // Email usage notices and opting out
+        add_filter('woocommerce_form_field_email', array( $this, 'checkout_add_email_usage_notice' ), 100, 2); // checkout
+        add_action('wp_ajax_nopriv_metorik_email_opt_out', array($this, 'ajax_email_opt_out'));
+        add_action('wp_ajax_metorik_email_opt_out', array($this, 'ajax_email_opt_out'));
+
+        // only wc 3.0+
+        if (version_compare(WC()->version, '3.0.0', '>=')) {
+            add_filter( 'woocommerce_checkout_fields', array( $this, 'move_checkout_email_field' ), 1 );
+        }
+
+        // Email add cart form (display / ajax to not display again)
+        add_action('wp_ajax_nopriv_metorik_add_cart_form_seen', array($this, 'ajax_set_seen_add_cart_form'));
+        add_action('wp_ajax_metorik_add_cart_form_seen', array($this, 'ajax_set_seen_add_cart_form'));
+        add_action('wp_footer', array($this, 'add_cart_email_form'));
     }
 
-    public function generate_cart_token()
-    {
-        $token = md5(time());
+    /**
+     * Generate a cart token (md5 of current time & random number).
+     * @todo improve.
+     */
+    public function generate_cart_token() {
+        $token = md5(time() . rand(100, 10000));
 
         return $token;
     }
 
-    public function get_or_set_cart_token()
-    {
+    /**
+     * Get or set the cart token.
+     */
+    public function get_or_set_cart_token() {
         if (!$token = $this->get_cart_token()) {
             $token = $this->set_cart_token();
         }
@@ -46,8 +68,10 @@ class Metorik_Helper_Carts
         return $token;
     }
 
-    public function get_cart_token($user_id = false)
-    {
+    /**
+     * Get cart token from session / user meta.
+     */
+    public function get_cart_token($user_id = false) {
         if ($user_id || ($user_id = get_current_user_id())) {
             $token = get_user_meta($user_id, '_metorik_cart_token', true);
 
@@ -62,8 +86,10 @@ class Metorik_Helper_Carts
         }
     }
 
-    public function set_cart_token()
-    {
+    /**
+     * Set the cart token in session/user meta.
+     */
+    public function set_cart_token() {
         $token = $this->generate_cart_token();
 
         WC()->session->set('metorik_cart_token', $token);
@@ -76,11 +102,59 @@ class Metorik_Helper_Carts
     }
 
     /**
+     * Return if a user has seen the add to cart form before.
+     */
+    public function seen_add_cart_form() {
+        return (bool) (WC()->session) ? WC()->session->get('metorik_seen_add_to_cart_form') : false;
+    }
+
+    /**
+     * Ajax set the add cart form to having been 'seen' in the session.
+     */
+    public function ajax_set_seen_add_cart_form() {
+        check_ajax_referer('metorik-js', 'security');
+
+        WC()->session->set('metorik_seen_add_to_cart_form', true);
+    }
+
+    /**
+     * Ajax email opt out.
+     */
+    public function ajax_email_opt_out() {
+        check_ajax_referer('metorik-js', 'security');
+
+        $this->set_customer_email_opt_out(true);
+    }
+
+    /**
+     * Get the customer email opt out setting.
+     */
+    public function get_customer_email_opt_out($user_id = false) {
+        if ($user_id || ($user_id = get_current_user_id())) {
+            return (bool) get_user_meta($user_id, '_metorik_customer_email_opt_out', true);
+        } elseif (isset(WC()->session)) {
+            return (bool) WC()->session->metorik_customer_email_opt_out;
+        }
+    }
+
+    /**
+     * Set the customer email opt out setting.
+     */
+    public function set_customer_email_opt_out($opt_out = true) {
+        WC()->session->set('metorik_customer_email_opt_out', $opt_out);
+
+        if ($user_id = get_current_user_id()) {
+            update_user_meta($user_id, '_metorik_customer_email_opt_out', $opt_out);
+        }
+
+        return $opt_out;
+    }
+
+    /**
      * Unset a cart token/recovery status.
      * Done when checking out after payment.
      */
-    public function unset_cart_token()
-    {
+    public function unset_cart_token() {
         if (WC()->session) {
             unset(WC()->session->metorik_cart_token, WC()->session->metorik_pending_recovery);
         }
@@ -96,8 +170,7 @@ class Metorik_Helper_Carts
      *
      * @return bool
      */
-    public static function cart_is_pending_recovery($user_id = null)
-    {
+    public static function cart_is_pending_recovery($user_id = null) {
         if ($user_id || ($user_id = get_current_user_id())) {
             return (bool) get_user_meta($user_id, '_metorik_pending_recovery', true);
         } elseif (isset(WC()->session)) {
@@ -113,13 +186,13 @@ class Metorik_Helper_Carts
      *
      * @return void
      */
-    public function ajax_send_cart()
-    {
+    public function ajax_send_cart() {
         check_ajax_referer('metorik-js', 'security');
+        //WC()->session->set('metorik_customer_email_opt_out', false);
 
         // metorik auth token? if none, stop
         $metorik_auth_token = get_option('metorik_auth_token');
-        if (!$metorik_auth_token) {
+        if (! $metorik_auth_token) {
             return;
         }
 
@@ -143,6 +216,7 @@ class Metorik_Helper_Carts
                 'currency'          => get_woocommerce_currency(),
                 'customer_id'       => $customer_id,
                 'email'             => $email,
+                'email_opt_out'    => $this->get_customer_email_opt_out(),
             ),
         );
 
@@ -160,13 +234,12 @@ class Metorik_Helper_Carts
      *
      * @return void
      */
-    public function check_cart_empty_and_send()
-    {
+    public function check_cart_empty_and_send() {
         // only continue if the cart is empty
         if (WC()->cart->is_empty()) {
             // metorik auth token? if none, stop
             $metorik_auth_token = get_option('metorik_auth_token');
-            if (!$metorik_auth_token) {
+            if (! $metorik_auth_token) {
                 return;
             }
 
@@ -193,8 +266,7 @@ class Metorik_Helper_Carts
      * Since WC won't calculate total unless on cart/checkout,
      * we need an alternative method to do it manually.
      */
-    protected function get_cart_total()
-    {
+    protected function get_cart_total() {
         if (
             is_checkout() ||
             is_cart() ||
@@ -214,8 +286,7 @@ class Metorik_Helper_Carts
     /**
      * Get the cart subtotal (maybe inclusive of taxes).
      */
-    public function get_cart_subtotal()
-    {
+    public function get_cart_subtotal() {
         if ('excl' === get_option('woocommerce_tax_display_cart')) {
             $subtotal = WC()->cart->subtotal_ex_tax;
         } else {
@@ -226,22 +297,28 @@ class Metorik_Helper_Carts
     }
 
     /**
+     * Link a customer's existing cart when logging in.
+     */
+    public function link_customer_existing_cart($user_login, $user) {
+        $session_token = (WC()->session) ? WC()->session->get('metorik_cart_token') : '';
+
+        // if session token and user, set in user meta
+        if ($session_token && $user) {
+            update_user_meta($user->ID, '_metorik_cart_token', $session_token);
+        }
+    }
+
+    /**
      * This is called once the checkout has been processed and an order has been created.
      */
-    public function checkout_order_processed($order_id)
-    {
+    public function checkout_order_processed($order_id) {
         // no metorik auth token? Stop
         $metorik_auth_token = get_option('metorik_auth_token');
-        if (!$metorik_auth_token) {
+        if (! $metorik_auth_token) {
             return;
         }
 
         $cart_token = $this->get_cart_token();
-
-        // generate a token if needed? not sure if needed/possible to send cart now
-        if (!$cart_token) {
-            //
-        }
 
         // save cart token to order meta
         if ($cart_token) {
@@ -257,8 +334,7 @@ class Metorik_Helper_Carts
     /**
      * Mark an order as recovered by Metorik.
      */
-    public function mark_order_as_recovered($order_id)
-    {
+    public function mark_order_as_recovered($order_id) {
         $order = wc_get_order($order_id);
 
         if (!$order instanceof WC_Order) {
@@ -275,8 +351,7 @@ class Metorik_Helper_Carts
      *
      * @since 1.1.0
      */
-    public function maybe_apply_cart_recovery_coupon()
-    {
+    public function maybe_apply_cart_recovery_coupon() {
         if ($this->cart_is_pending_recovery() && !empty($_REQUEST['coupon'])) {
             $coupon_code = wc_clean(rawurldecode($_REQUEST['coupon']));
 
@@ -291,8 +366,7 @@ class Metorik_Helper_Carts
      *
      * @return void
      */
-    public function api_recover_cart_route()
-    {
+    public function api_recover_cart_route() {
         register_rest_route('metorik/v1', '/recover-cart', array(
             'methods'  => 'GET',
             'callback' => array($this, 'recover_cart_callback'),
@@ -302,8 +376,7 @@ class Metorik_Helper_Carts
     /**
      * API route callback for recovering a cart.
      */
-    public function recover_cart_callback($request)
-    {
+    public function recover_cart_callback($request) {
         // Check token is set and has a value before continuing.
         if (isset($request['token']) && $cart_token = $request['token']) {
             // base checkout url
@@ -343,11 +416,10 @@ class Metorik_Helper_Carts
     /**
      * Restore an actual cart.
      */
-    public function restore_cart($cart_token)
-    {
+    public function restore_cart($cart_token) {
         // metorik auth token
         $metorik_auth_token = get_option('metorik_auth_token');
-        if (!$metorik_auth_token) {
+        if (! $metorik_auth_token) {
             throw new Exception('Missing Metorik authentication token');
         }
 
@@ -396,6 +468,211 @@ class Metorik_Helper_Carts
             update_user_meta($user_id, '_metorik_cart_token', $cart_token);
             update_user_meta($user_id, '_metorik_pending_recovery', true);
         }
+    }
+
+    /**
+     * Get a cart setting (stored in metorik.php over API).
+     */
+    public function get_cart_setting($key = false) {
+        $settings = get_option('metorik_cart_settings');
+
+        // no key defined or settings saved? false
+        if (! $key || ! $settings) {
+            return false;
+        }
+
+        // json decode
+        $settings = json_decode($settings);
+
+        // not set? false
+        if (! isset($settings->$key)) {
+            return false;
+        }
+        
+        return $settings->$key;
+    }
+
+    /**
+     * Add the email usage notice to checkout.
+     * Method required due to WC < 3.4 html handling.
+     */
+    public function checkout_add_email_usage_notice($field, $key) {
+        // metorik auth token? if none, stop
+        $metorik_auth_token = get_option('metorik_auth_token');
+        if (! $metorik_auth_token) {
+            return;
+        }
+
+        if ( is_checkout() 
+            && 'billing_email' === $key
+		    && $this->get_cart_setting('email_usage_notice')
+		    && ! $this->get_customer_email_opt_out() ) {
+			// find the trailing </p> tag to replace with our notice + </p>
+			$pos     = strrpos( $field, '</p>' );
+			$replace = $this->render_email_usage_notice() . '</p>';
+
+			if ( false !== $pos ) {
+				$field = substr_replace( $field, $replace, $pos, strlen( '</p>' ) );
+			}
+		}
+
+		return $field;
+	}
+
+	/**
+	 * Move the email field to the top of the checkout billing form.
+	 *
+	 * WC 3.0+ moved the email field to the bottom of the checkout form,
+	 * which is less than ideal for capturing it. This method moves it
+	 * to the top and makes it full-width.
+	 */
+	public function move_checkout_email_field( $fields ) {
+
+		if ( isset( $fields['billing']['billing_email']['priority'] ) ) {
+
+			$email_field = $fields['billing']['billing_email'];
+			unset( $fields['billing']['billing_email'] );
+
+			$email_field['priority']  = 5;
+			$email_field['class']     = array( 'form-row-wide' );
+			$email_field['autofocus'] = true;
+
+			$fields['billing'] = array_merge( array( 'billing_email' => $email_field ), $fields['billing'] );
+
+			// adjust layout of postcode/phone fields
+			if ( isset( $fields['billing']['billing_postcode'], $fields['billing']['billing_phone'] ) ) {
+
+				// note this method is hooked in at priority 1, so other customizations *should* be safe to add additional classes since we've gone first
+				$fields['billing']['billing_postcode']['class'] = array( 'form-row-first', 'address-field' );
+				$fields['billing']['billing_phone']['class']    = array( 'form-row-last' );
+			}
+
+			// remove autofocus from billing first name (set to email above)
+			if ( isset( $fields['billing']['billing_first_name'] ) && ! empty( $fields['billing']['billing_first_name']['autofocus'] ) ) {
+				$fields['billing']['billing_first_name']['autofocus'] = false;
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Render an email usage notice.
+	 */
+	public function render_email_usage_notice() {
+		/* translators: Placeholders: %1$s - opening HTML <a> link tag, %2$s - closing HTML </a> link tag */
+		$notice = sprintf( __( 'We save your email and cart so we can send you reminders - %1$sdon\'t email me%2$s.', 'metorik' ),
+			'<a href="#" class="metorik-email-usage-notice-link">', '</a>'
+		);
+
+		/**
+		 * Filters the email usage notice contents.
+		 */
+        $notice = (string) apply_filters( 'metorik_cart_email_usage_notice', $notice );
+        
+		return '<span class="metorik-email-usage-notice" style="display:inline-block;padding-top:10px;">' . $notice . '</span>';
+    }
+    
+    /**
+     * Add cart email form (end of DOM in WP footer). JS loads it.
+     */
+    public function add_cart_email_form() {
+        // Only if setting enabled, user not logged in, and never seen before
+        if ($this->get_cart_setting('add_cart_popup')
+            && ! get_current_user_id()
+            && ! $this->seen_add_cart_form()) {
+            // Title
+            $title = $this->get_cart_setting('add_cart_popup_title');
+            if (! $title) {
+                $title = 'Remember your cart';
+            }
+
+            // Email usage notice
+            $email_usage_notice = false;
+            if ($this->get_cart_setting('email_usage_notice') && ! $this->get_customer_email_opt_out()) {
+                $email_usage_notice = $this->render_email_usage_notice();
+            }
+
+            // Variables
+            $args = array(
+                'title' => $title,
+                'email_usage_notice' => $email_usage_notice,
+            );
+
+            // Output template wrapped in 'add-cart-email-wrapper' div (used by JS)
+            echo '<div class="add-cart-email-wrapper">';
+                $this->get_template('add-cart-email-form.php', $args);
+            echo '</div>';
+        }
+    }
+
+    /**
+     * Get template.
+     *
+     * Search for the template and include the file.
+     *
+     * @author https://jeroensormani.com/how-to-add-template-files-in-your-plugin/
+     * @see $this->locate_template()
+     *
+     * @param string 	$template_name			Template to load.
+     * @param array 	$args					Args passed for the template file.
+     * @param string 	$string $template_path	Path to templates.
+     * @param string	$default_path			Default path to template files.
+     */
+    function get_template( $template_name, $args = array(), $tempate_path = '', $default_path = '' ) {
+        if ( is_array( $args ) && isset( $args ) ) {
+            extract( $args );
+        }
+
+        $template_file = $this->locate_template( $template_name, $tempate_path, $default_path );
+
+        if ( ! file_exists( $template_file ) ) {
+            _doing_it_wrong( __FUNCTION__, sprintf( '<code>%s</code> does not exist.', $template_file ), '1.0.0' );
+            return;
+        }
+
+        include $template_file;
+    }
+
+    /**
+     * Locate template.
+     *
+     * Locate the called template.
+     * Search Order:
+     * 1. /themes/theme/metorik/$template_name
+     * 2. /themes/theme/$template_name
+     * 3. /plugins/metorik/templates/$template_name.
+     *
+     * @author https://jeroensormani.com/how-to-add-template-files-in-your-plugin/
+     *
+     * @param 	string 	$template_name			Template to load.
+     * @param 	string 	$string $template_path	Path to templates.
+     * @param 	string	$default_path			Default path to template files.
+     * @return 	string 							Path to the template file.
+     */
+    public function locate_template( $template_name, $template_path = '', $default_path = '' ) {
+        // Set variable to search in metorik folder of theme.
+        if ( ! $template_path ) {
+            $template_path = 'metorik/';
+        }
+
+        // Set default plugin templates path.
+        if ( ! $default_path ) {
+            $default_path = plugin_dir_path( dirname(__FILE__) ) . 'templates/'; // Path to the template folder
+        }
+
+        // Search template file in theme folder.
+        $template = locate_template( array(
+            $template_path . $template_name,
+            $template_name
+        ) );
+
+        // Get plugins template file.
+        if ( ! $template ) {
+            $template = $default_path . $template_name;
+        }
+
+        return apply_filters( 'metorik_locate_template', $template, $template_name, $template_path, $default_path );
     }
 }
 
