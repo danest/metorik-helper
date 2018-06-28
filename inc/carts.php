@@ -202,6 +202,11 @@ class Metorik_Helper_Carts
         $customer_id = get_current_user_id();
         $email = isset($_POST['email']) && $_POST['email'] ? sanitize_email($_POST['email']) : null;
 
+        // if no cart, stop
+        if (! $cart) {
+            return;
+        }
+
         $data = array(
             'api_token' => $metorik_auth_token,
             'data'      => array(
