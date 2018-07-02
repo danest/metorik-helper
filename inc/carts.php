@@ -5,8 +5,7 @@
  */
 class Metorik_Helper_Carts
 {
-    //protected $apiUrl = 'https://app.metorik.com/api/store';
-    protected $apiUrl = 'http://metorik-app.test/api/store';
+    protected $apiUrl = 'https://app.metorik.com/api/store';
 
     /**
      * Constructor.
