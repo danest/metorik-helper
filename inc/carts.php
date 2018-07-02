@@ -217,7 +217,7 @@ class Metorik_Helper_Carts
         $email = isset($_POST['email']) && $_POST['email'] ? sanitize_email($_POST['email']) : null;
 
         // if no cart, stop
-        if (! $cart) {
+        if (!$cart) {
             return;
         }
 
