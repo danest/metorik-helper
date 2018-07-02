@@ -65,7 +65,7 @@
                 email: email,
             };
 
-            $.post(ajaxurl, data, function(response) {
+            $.post(metorik_params.ajaxurl, data, function(response) {
                 //
             });
         };
@@ -139,7 +139,7 @@
                         security: metorik_params.nonce,
                     };
 
-                    $.post(ajaxurl, data, function(response) {
+                    $.post(metorik_params.ajaxurl, data, function(response) {
                         //
                     });
                 },
@@ -179,7 +179,7 @@
                 security: metorik_params.nonce,
             };
 
-            $.post(ajaxurl, data, function(response) {
+            $.post(metorik_params.ajaxurl, data, function(response) {
                 // hide email usage notice
                 $('.metorik-email-usage-notice').css('display', 'none');
 

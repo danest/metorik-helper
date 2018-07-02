@@ -76,6 +76,7 @@ class Metorik_Custom
         $params = array(
             'lifetime'      => (int) apply_filters('metorik_cookie_lifetime', 6), // 6 months
             'session'       => (int) apply_filters('metorik_session_length', 30), // 30 minutes
+            'ajaxurl'       => admin_url( 'admin-ajax.php' ),
             'nonce'         => wp_create_nonce('metorik-js'),
             'cart_tracking' => get_option('metorik_auth_token') ? true : false,
         );
