@@ -3,4 +3,3 @@ php:
     - long_array_syntax
   disabled:
     - short_array_syntax
-js: true
