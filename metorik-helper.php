@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Metorik Helper
  * Plugin URI: https://metorik.com
- * Description: Provides some fixes & extensions for WooCommerce, required by Metorik.
+ * Description: Reports, integrations, automatic emails, and cart tracking for WooCommerce stores.
  * Version: 1.0.0
  * Author: Metorik
  * Author URI: https://metorik.com
