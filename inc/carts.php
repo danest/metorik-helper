@@ -616,7 +616,7 @@ class Metorik_Helper_Carts
             // Title
             $title = $this->get_cart_setting('add_cart_popup_title');
             if (!$title) {
-                $title = 'Remember your cart';
+                $title = 'Save your cart?';
             }
 
             // Email usage notice
