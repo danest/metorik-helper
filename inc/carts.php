@@ -202,7 +202,6 @@ class Metorik_Helper_Carts
     public function ajax_send_cart()
     {
         check_ajax_referer('metorik-js', 'security');
-        //WC()->session->set('metorik_customer_email_opt_out', false);
 
         // metorik auth token? if none, stop
         $metorik_auth_token = get_option('metorik_auth_token');
