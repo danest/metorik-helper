@@ -415,6 +415,11 @@ class Metorik_Helper_Carts
                 }
             }
 
+            // no session? start so cart/notices work
+            if (!WC()->session->has_session()) {
+                WC()->session->set_customer_session_cookie(true);
+            }
+
             // try restore the cart
             try {
                 $this->restore_cart($cart_token);
@@ -424,11 +429,6 @@ class Metorik_Helper_Carts
                     $checkout_url = add_query_arg(array('coupon' => wc_clean($coupon)), $checkout_url);
                 }
             } catch (Exception $e) {
-                // no session? start so notices will be shown
-                if (!WC()->session->has_session()) {
-                    WC()->session->set_customer_session_cookie(true);
-                }
-
                 // add a notice
                 wc_add_notice(__('Sorry, we were not able to restore your cart. Please try adding your items to your cart again.', 'metorik'), 'error');
             }
