@@ -53,21 +53,25 @@
          * Send cart data.
          * @todo Only if cart token set up.
          */
+        var cartTimer;
         var sendCartData = function(customEmail) {
-            var email = isValidEmail($('#billing_email').val()) ? $('#billing_email').val() : null;
-            if (customEmail) {
-                email = customEmail;
-            }
+            clearTimeout(cartTimer);
+            cartTimer = setTimeout(function () {
+                var email = isValidEmail($('#billing_email').val()) ? $('#billing_email').val() : null;
+                if (customEmail) {
+                    email = customEmail;
+                }
 
-            var data = {
-                action: 'metorik_send_cart',
-                security: metorik_params.nonce,
-                email: email,
-            };
+                var data = {
+                    action: 'metorik_send_cart',
+                    security: metorik_params.nonce,
+                    email: email,
+                };
 
-            $.post(metorik_params.ajaxurl, data, function(response) {
-                //
-            });
+                $.post(metorik_params.ajaxurl, data, function (response) {
+                    //
+                });
+            }, 500);
         };
 
         /**
