@@ -23,9 +23,9 @@ Tired of spending half your day waiting for WooCommerce reports to load? Metorik
 
 What's your average customer LTV (lifetime value)? What's your average numbers of items per order? How many of product A or variation B did you sell last month? If these are questions you've always wanted answers for, Metorik will be a lifesaver.
 
-= Filter everything by anything =
+= Segment everything by anything =
 
-Metorik offers a robust & powerful filter system. It allows you segment your data by anything and everything (seriously), export that segmented data to a CSV (automatically, if that's your thing). You can even save the filters you used for next time, or share them with your team.
+Metorik offers a robust & powerful [segmenting system](https://help.metorik.com/article/54-all-about-segmenting). It allows you segment your data by anything and everything (seriously), export that segmented data to a CSV (automatically, if that's your thing). You can even save the filters you used for next time, or share them with your team.
 
 Want all customers who have an LTV over $100 and own a certain product? **Easy.**
 
@@ -35,7 +35,21 @@ Subscriptions that were set to be canceled this week? **Easy.**
 
 Customers who haven't ordered in 4 months and live in California? **Easy.**
 
-Read more about the filter system [here](https://metorik.com/blog/improved-segmenting-filtering-in-metorik?ref=wporg).
+Read more about the segmenting system [here](https://metorik.com/blog/improved-segmenting-filtering-in-metorik?ref=wporg).
+
+= Send automated emails to customers =
+
+With [Metorik Engage](https://metorik.com/engage?ref=wporg) and it's accompanying segmenting system, you can send targeted emails to customers automatically as soon as they match certain rules.
+
+For example, email customers whenever they've spent over $500 and include a coupon code uniquely generated for them for 20% off.
+
+Writing emails couldn't be easier with Engage's email builder and each automation comes with a comprehensive report so you can see which emails are converting and which ones are being ignored.
+
+= Cart tracking and reports =
+
+[Metorik tracks every cart](https://metorik.com/carts) started on your store, making it easy for you to see all open, abandoned, and placed carts. Also included is the Carts Report, covering all of your cart-related stats.
+
+And better yet, through Metorik Engage, you can send automatic cart recovery emails to try get customers to complete their purchase.
 
 = Customer service integrations =
 
