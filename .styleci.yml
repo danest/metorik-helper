@@ -1,5 +1,4 @@
-php:
-  enabled:
-    - long_array_syntax
-  disabled:
-    - short_array_syntax
+enabled:
+  - long_array_syntax
+disabled:
+  - short_array_syntax
