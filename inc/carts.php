@@ -557,6 +557,12 @@ class Metorik_Helper_Carts
      */
     public function move_checkout_email_field($fields)
     {
+        // metorik auth token? if none, stop and return fields as-is
+        $metorik_auth_token = get_option('metorik_auth_token');
+        if (!$metorik_auth_token) {
+            return $fields;
+        }
+
         if (isset($fields['billing']['billing_email']['priority'])) {
             $email_field = $fields['billing']['billing_email'];
             unset($fields['billing']['billing_email']);
@@ -607,6 +613,12 @@ class Metorik_Helper_Carts
      */
     public function add_cart_email_form()
     {
+        // metorik auth token? if none, stop
+        $metorik_auth_token = get_option('metorik_auth_token');
+        if (!$metorik_auth_token) {
+            return;
+        }
+
         // Only if setting enabled, user not logged in, and never seen before
         if ($this->get_cart_setting('add_cart_popup')
             && !get_current_user_id()
