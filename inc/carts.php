@@ -563,27 +563,25 @@ class Metorik_Helper_Carts
             return $fields;
         }
 
-        if (isset($fields['billing']['billing_email']['priority'])) {
-            $email_field = $fields['billing']['billing_email'];
-            unset($fields['billing']['billing_email']);
+        // Only if setting enabled
+        if ($this->get_cart_setting('move_email_field_top_checkout')) {
+            if (isset($fields['billing']['billing_email']['priority'])) {
+                $fields['billing']['billing_email']['priority'] = 5;
+                $fields['billing']['billing_email']['class'] = array('form-row-wide');
+                $fields['billing']['billing_email']['autofocus'] = true;
 
-            $email_field['priority'] = 5;
-            $email_field['class'] = array('form-row-wide');
-            $email_field['autofocus'] = true;
+                // adjust layout of postcode/phone fields
+                if (isset($fields['billing']['billing_postcode'], $fields['billing']['billing_phone'])) {
 
-            $fields['billing'] = array_merge(array('billing_email' => $email_field), $fields['billing']);
+                    // note this method is hooked in at priority 1, so other customizations *should* be safe to add additional classes since we've gone first
+                    $fields['billing']['billing_postcode']['class'] = array('form-row-first', 'address-field');
+                    $fields['billing']['billing_phone']['class'] = array('form-row-last');
+                }
 
-            // adjust layout of postcode/phone fields
-            if (isset($fields['billing']['billing_postcode'], $fields['billing']['billing_phone'])) {
-
-                // note this method is hooked in at priority 1, so other customizations *should* be safe to add additional classes since we've gone first
-                $fields['billing']['billing_postcode']['class'] = array('form-row-first', 'address-field');
-                $fields['billing']['billing_phone']['class'] = array('form-row-last');
-            }
-
-            // remove autofocus from billing first name (set to email above)
-            if (isset($fields['billing']['billing_first_name']) && !empty($fields['billing']['billing_first_name']['autofocus'])) {
-                $fields['billing']['billing_first_name']['autofocus'] = false;
+                // remove autofocus from billing first name (set to email above)
+                if (isset($fields['billing']['billing_first_name']) && !empty($fields['billing']['billing_first_name']['autofocus'])) {
+                    $fields['billing']['billing_first_name']['autofocus'] = false;
+                }
             }
         }
 
