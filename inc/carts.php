@@ -36,9 +36,12 @@ class Metorik_Helper_Carts
         add_action('wp_ajax_nopriv_metorik_email_opt_out', array($this, 'ajax_email_opt_out'));
         add_action('wp_ajax_metorik_email_opt_out', array($this, 'ajax_email_opt_out'));
 
-        // only wc 3.0+
-        if (version_compare(WC()->version, '3.0.0', '>=')) {
-            add_filter('woocommerce_checkout_fields', array($this, 'move_checkout_email_field'), 1);
+        // Only if setting is enabled and WC 3.0+
+        if (
+            $this->get_cart_setting('move_email_field_top_checkout') &&
+            version_compare(WC()->version, '3.0.0', '>=')
+        ) {
+            add_filter('woocommerce_checkout_fields', array($this, 'move_checkout_email_field'), 5);
         }
 
         // Email add cart form (display / ajax to not display again)
@@ -549,11 +552,7 @@ class Metorik_Helper_Carts
     }
 
     /**
-     * Move the email field to the top of the checkout billing form.
-     *
-     * WC 3.0+ moved the email field to the bottom of the checkout form,
-     * which is less than ideal for capturing it. This method moves it
-     * to the top and makes it full-width.
+     * Move the email field to the top of the checkout billing form (3.0+ only)
      */
     public function move_checkout_email_field($fields)
     {
@@ -563,25 +562,20 @@ class Metorik_Helper_Carts
             return $fields;
         }
 
-        // Only if setting enabled
-        if ($this->get_cart_setting('move_email_field_top_checkout')) {
-            if (isset($fields['billing']['billing_email']['priority'])) {
-                $fields['billing']['billing_email']['priority'] = 5;
-                $fields['billing']['billing_email']['class'] = array('form-row-wide');
-                $fields['billing']['billing_email']['autofocus'] = true;
+        if (isset($fields['billing']['billing_email']['priority'])) {
+            $fields['billing']['billing_email']['priority'] = 5;
+            $fields['billing']['billing_email']['class'] = array('form-row-wide');
+            $fields['billing']['billing_email']['autofocus'] = true;
 
-                // adjust layout of postcode/phone fields
-                if (isset($fields['billing']['billing_postcode'], $fields['billing']['billing_phone'])) {
+            // adjust layout of postcode/phone fields
+            if (isset($fields['billing']['billing_postcode'], $fields['billing']['billing_phone'])) {
+                $fields['billing']['billing_postcode']['class'] = array('form-row-first', 'address-field');
+                $fields['billing']['billing_phone']['class'] = array('form-row-last');
+            }
 
-                    // note this method is hooked in at priority 1, so other customizations *should* be safe to add additional classes since we've gone first
-                    $fields['billing']['billing_postcode']['class'] = array('form-row-first', 'address-field');
-                    $fields['billing']['billing_phone']['class'] = array('form-row-last');
-                }
-
-                // remove autofocus from billing first name (set to email above)
-                if (isset($fields['billing']['billing_first_name']) && !empty($fields['billing']['billing_first_name']['autofocus'])) {
-                    $fields['billing']['billing_first_name']['autofocus'] = false;
-                }
+            // remove autofocus from billing first name (set to email above)
+            if (isset($fields['billing']['billing_first_name']) && !empty($fields['billing']['billing_first_name']['autofocus'])) {
+                $fields['billing']['billing_first_name']['autofocus'] = false;
             }
         }
 
