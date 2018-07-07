@@ -552,7 +552,7 @@ class Metorik_Helper_Carts
     }
 
     /**
-     * Move the email field to the top of the checkout billing form (3.0+ only)
+     * Move the email field to the top of the checkout billing form (3.0+ only).
      */
     public function move_checkout_email_field($fields)
     {
