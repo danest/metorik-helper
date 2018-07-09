@@ -169,6 +169,7 @@
         /**
          * Listen for add cart email input changes.
          */
+        var addCartTimer;
         $(document).on('input', '.metorik-add-cart-email-form .email-input', function(e) {
             var _this = $(this);
             var _wrapper = _this.parent();
@@ -176,8 +177,8 @@
             // clear classes on input change
             _wrapper.removeClass('success');
 
-            clearTimeout(timer);
-            timer = setTimeout(function() {
+            clearTimeout(addCartTimer);
+            addCartTimer = setTimeout(function() {
                 if (isValidEmail(_this.val())) {
                     _wrapper.addClass('success');
                     sendCartData(_this.val());
