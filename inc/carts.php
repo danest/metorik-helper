@@ -216,6 +216,7 @@ class Metorik_Helper_Carts
         $token = $this->get_or_set_cart_token();
         $customer_id = get_current_user_id();
         $email = isset($_POST['email']) && $_POST['email'] ? sanitize_email($_POST['email']) : null;
+        $name = isset($_POST['name']) && $_POST['name'] ? sanitize_text_field($_POST['name']) : null;
 
         // if no cart, stop
         if (!$cart) {
@@ -236,6 +237,7 @@ class Metorik_Helper_Carts
                 'currency'          => get_woocommerce_currency(),
                 'customer_id'       => $customer_id,
                 'email'             => $email,
+                'name'              => $name,
                 'email_opt_out'     => $this->get_customer_email_opt_out(),
             ),
         );

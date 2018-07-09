@@ -62,10 +62,13 @@
                     email = customEmail;
                 }
 
+                var name = $('#billing_first_name').val();
+
                 var data = {
                     action: 'metorik_send_cart',
                     security: metorik_params.nonce,
                     email: email,
+                    name: name,
                 };
 
                 $.post(metorik_params.ajaxurl, data, function (response) {
@@ -95,15 +98,28 @@
         /**
          * Watch for email input changes.
          */
-        var timer;
+        var email_input_timer;
         $('#billing_email').bind('blur', function(e) {
             var _this = $(this);
 
-            clearTimeout(timer);
-            timer = setTimeout(function() {
+            clearTimeout(email_input_timer);
+            email_input_timer = setTimeout(function() {
                 if (isValidEmail(_this.val())) {
                     sendCartData();
                 }
+            }, 500);
+        });
+
+        /**
+         * Watch for name input changes.
+         */
+        var name_input_timer;
+        $('#billing_first_name').bind('blur', function (e) {
+            var _this = $(this);
+
+            clearTimeout(name_input_timer);
+            name_input_timer = setTimeout(function () {
+                sendCartData();
             }, 500);
         });
 
