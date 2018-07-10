@@ -528,7 +528,7 @@ class Metorik_Helper_Carts
     {
         // metorik auth token? if none, stop
         $metorik_auth_token = get_option('metorik_auth_token');
-        if (! $metorik_auth_token) {
+        if (!$metorik_auth_token) {
             return $field;
         }
 
@@ -536,7 +536,7 @@ class Metorik_Helper_Carts
         if (
             $key === 'billing_email' &&
             $this->get_cart_setting('email_usage_notice') &&
-            ! $this->get_customer_email_opt_out()
+            !$this->get_customer_email_opt_out()
         ) {
             // find the trailing </p> tag to replace with our notice + </p>
             $pos = strrpos($field, '</p>');
