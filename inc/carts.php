@@ -32,17 +32,12 @@ class Metorik_Helper_Carts
         add_action('woocommerce_cart_loaded_from_session', array($this, 'maybe_apply_cart_recovery_coupon'), 11);
 
         // Email usage notices and opting out
-        add_filter('woocommerce_form_field_email', array($this, 'checkout_add_email_usage_notice'), 100, 2); // checkout
+        add_filter('woocommerce_form_field_email', array($this, 'checkout_add_email_usage_notice'), 100, 2);
         add_action('wp_ajax_nopriv_metorik_email_opt_out', array($this, 'ajax_email_opt_out'));
         add_action('wp_ajax_metorik_email_opt_out', array($this, 'ajax_email_opt_out'));
 
-        // Only if setting is enabled and WC 3.0+
-        if (
-            $this->get_cart_setting('move_email_field_top_checkout') &&
-            version_compare(WC()->version, '3.0.0', '>=')
-        ) {
-            add_filter('woocommerce_checkout_fields', array($this, 'move_checkout_email_field'), 5);
-        }
+        // Move email checkout field
+        add_filter('woocommerce_checkout_fields', array($this, 'move_checkout_email_field'), 5);
 
         // Email add cart form (display / ajax to not display again)
         add_action('wp_ajax_nopriv_metorik_add_cart_form_seen', array($this, 'ajax_set_seen_add_cart_form'));
@@ -533,14 +528,16 @@ class Metorik_Helper_Carts
     {
         // metorik auth token? if none, stop
         $metorik_auth_token = get_option('metorik_auth_token');
-        if (!$metorik_auth_token) {
-            return;
+        if (! $metorik_auth_token) {
+            return $field;
         }
 
-        if (is_checkout()
-            && 'billing_email' === $key
-            && $this->get_cart_setting('email_usage_notice')
-            && !$this->get_customer_email_opt_out()) {
+        // only if 3.4+, setting enabled, customer hasn't already opted out and billing email field exists
+        if (
+            $key === 'billing_email' &&
+            $this->get_cart_setting('email_usage_notice') &&
+            ! $this->get_customer_email_opt_out()
+        ) {
             // find the trailing </p> tag to replace with our notice + </p>
             $pos = strrpos($field, '</p>');
             $replace = $this->render_email_usage_notice().'</p>';
@@ -564,7 +561,12 @@ class Metorik_Helper_Carts
             return $fields;
         }
 
-        if (isset($fields['billing']['billing_email']['priority'])) {
+        // Oonly if setting is enabled and WC 3.0+)
+        if (
+            $this->get_cart_setting('move_email_field_top_checkout') &&
+            version_compare(WC()->version, '3.0.0', '>=') &&
+            isset($fields['billing']['billing_email']['priority'])
+        ) {
             $fields['billing']['billing_email']['priority'] = 5;
             $fields['billing']['billing_email']['class'] = array('form-row-wide');
             $fields['billing']['billing_email']['autofocus'] = true;
