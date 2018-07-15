@@ -474,7 +474,7 @@ class Metorik_Helper_Carts
         $body = json_decode($body);
 
         // no data/cart? stop
-        if (! isset($body->data->cart)) {
+        if (!isset($body->data->cart)) {
             throw new Exception('Error getting cart from Metorik');
         }
 
