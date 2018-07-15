@@ -44,4 +44,175 @@
     if ($('.woocommerce form.register').length) {
         setFields();
     }
+
+    /**
+     * Cart functionality - only if cart tracking enabled.
+     */
+    if (metorik_params.cart_tracking) {
+        /**
+         * Send cart data.
+         * @todo Only if cart token set up.
+         */
+        var cartTimer;
+        var sendCartData = function(customEmail) {
+            clearTimeout(cartTimer);
+            cartTimer = setTimeout(function () {
+                var email = isValidEmail($('#billing_email').val()) ? $('#billing_email').val() : null;
+                if (customEmail) {
+                    email = customEmail;
+                }
+
+                var name = $('#billing_first_name').val();
+
+                var data = {
+                    action: 'metorik_send_cart',
+                    security: metorik_params.nonce,
+                    email: email,
+                    name: name,
+                };
+
+                $.post(metorik_params.ajaxurl, data, function (response) {
+                    //
+                });
+            }, 500);
+        };
+
+        /**
+         * Function to check if an email is valid.
+         * @param {*} email
+         */
+        var isValidEmail = function(email) {
+            return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
+        };
+
+        /**
+         * Listen for events then send cart data.
+         */
+        $(document.body).on(
+            'wc_fragments_refreshed added_to_cart removed_from_cart updated_cart_totals updated_shipping_method applied_coupon removed_coupon updated_checkout',
+            function(event) {
+                sendCartData();
+            }
+        );
+
+        /**
+         * Watch for email input changes.
+         */
+        var email_input_timer;
+        $('#billing_email').bind('blur', function(e) {
+            var _this = $(this);
+
+            clearTimeout(email_input_timer);
+            email_input_timer = setTimeout(function() {
+                if (isValidEmail(_this.val())) {
+                    sendCartData();
+                }
+            }, 500);
+        });
+
+        /**
+         * Watch for name input changes.
+         */
+        var name_input_timer;
+        $('#billing_first_name').bind('blur', function (e) {
+            var _this = $(this);
+
+            clearTimeout(name_input_timer);
+            name_input_timer = setTimeout(function () {
+                sendCartData();
+            }, 500);
+        });
+
+        /**
+         * Popup to capture email when added to cart (if wrapper class exists/output on page).
+         */
+        var addToCartSeen = false;
+        if ($('.add-cart-email-wrapper').length && $('.button.ajax_add_to_cart').length) {
+            tippy('.button.ajax_add_to_cart', {
+                html: '.add-cart-email-wrapper',
+                theme: 'light',
+                trigger: 'click',
+                hideOnClick: true,
+                interactive: true,
+                arrow: true,
+                distance: 15,
+                placement: 'bottom',
+                wait: function(show) {
+                    /**
+                     * Only show if add to cart seen not true.
+                     */
+                    if (!addToCartSeen) {
+                        show();
+                    }
+                },
+                onShow: function() {
+                    /**
+                     * Set the add to cart fomr as having been senen so it doesn't get shown again.
+                     */
+                    addToCartSeen = true;
+
+                    /**
+                     * Make an AJAX request to set the add cart form as 'seen'.
+                     */
+                    var data = {
+                        action: 'metorik_add_cart_form_seen',
+                        security: metorik_params.nonce,
+                    };
+
+                    $.post(metorik_params.ajaxurl, data, function(response) {
+                        //
+                    });
+                },
+            });
+        }
+
+        /**
+         * Listen for add cart email input changes.
+         */
+        var addCartTimer;
+        $(document).on('input', '.metorik-add-cart-email-form .email-input', function(e) {
+            var _this = $(this);
+            var _wrapper = _this.parent();
+
+            // clear classes on input change
+            _wrapper.removeClass('success');
+
+            clearTimeout(addCartTimer);
+            addCartTimer = setTimeout(function() {
+                if (isValidEmail(_this.val())) {
+                    _wrapper.addClass('success');
+                    sendCartData(_this.val());
+                }
+            }, 500);
+        });
+
+        /**
+         * Listen for email usage opt-out clicks and send AJAX request to do so.
+         */
+        $(document).on('click', '.metorik-email-usage-notice-link', function(e) {
+            e.preventDefault();
+
+            // loading
+            $('.metorik-email-usage-notice').css({ opacity: '0.5', 'pointer-events': 'none' });
+
+            var data = {
+                action: 'metorik_email_opt_out',
+                security: metorik_params.nonce,
+            };
+
+            $.post(metorik_params.ajaxurl, data, function(response) {
+                // hide email usage notice
+                $('.metorik-email-usage-notice').css('display', 'none');
+
+                // close/hide tippy if have
+                const button = $('.button.ajax_add_to_cart.tippy-active');
+                if (button.length && button[0]._tippy) {
+                    button[0]._tippy.hide();
+                }
+
+                // send cart so we can send email opted out
+                sendCartData();
+            });
+        });
+    }
 })(jQuery);

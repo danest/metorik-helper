@@ -2,19 +2,19 @@
 /**
  * Plugin Name: Metorik Helper
  * Plugin URI: https://metorik.com
- * Description: Provides some fixes & extensions for WooCommerce, required by Metorik.
- * Version: 0.15.0
+ * Description: Reports, integrations, automatic emails, and cart tracking for WooCommerce stores.
+ * Version: 1.0.0
  * Author: Metorik
  * Author URI: https://metorik.com
  * WC requires at least: 2.6.0
- * WC tested up to: 3.3.0.
+ * WC tested up to: 3.4.0.
  */
 class Metorik_Helper
 {
     /**
      * Current version of Metorik.
      */
-    public $version = '0.15.0';
+    public $version = '1.0.0';
 
     /**
      * URL dir for plugin.
@@ -68,6 +68,7 @@ class Metorik_Helper
             require_once 'inc/api.php';
             require_once 'inc/ui.php';
             require_once 'inc/custom.php';
+            require_once 'inc/carts.php';
         } else {
             add_action('admin_notices', array($this, 'no_wc'));
         }
