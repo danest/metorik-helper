@@ -409,7 +409,7 @@ class Metorik_Helper_Carts
             $checkout_url = wc_get_checkout_url();
 
             // forward along any UTM or metorik params
-            foreach ($request as $key => $val) {
+            foreach ($request->get_params() as $key => $val) {
                 if (0 === strpos($key, 'utm_') || 0 === strpos($key, 'mtk')) {
                     $checkout_url = add_query_arg($key, $val, $checkout_url);
                 }
@@ -472,6 +472,11 @@ class Metorik_Helper_Carts
 
         // json decode
         $body = json_decode($body);
+
+        // no data/cart? stop
+        if (! isset($body->data->cart)) {
+            throw new Exception('Error getting cart from Metorik');
+        }
 
         // get cart
         $cart = $body->data->cart;
