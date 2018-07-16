@@ -79,6 +79,7 @@ class Metorik_Helper_Carts
 
             // if no user meta token, check session cart token first and use that
             if (!$token && WC()->session && WC()->session->get('metorik_cart_token')) {
+                $token = WC()->session->get('metorik_cart_token');
                 update_user_meta($user_id, '_metorik_cart_token', $token);
             }
 
