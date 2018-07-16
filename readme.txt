@@ -120,6 +120,9 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
+= 1.0.2 =
+* Improve cart token setting for guests that log in or register during their session.
+
 = 1.0.1 =
 * Fix tracking of the Engage automation ID during a cart recovery.
 
