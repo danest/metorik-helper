@@ -120,6 +120,9 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
+= 1.0.1 =
+* Fix tracking of the Engage automation ID during a cart recovery.
+
 = 1.0.0 =
 * Cart tracking.
 * Cart email popup capturing.
