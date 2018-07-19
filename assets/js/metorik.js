@@ -127,42 +127,45 @@
          * Popup to capture email when added to cart (if wrapper class exists/output on page).
          */
         var addToCartSeen = false;
-        if ($('.add-cart-email-wrapper').length && $('.button.ajax_add_to_cart').length) {
-            tippy('.button.ajax_add_to_cart', {
-                html: '.add-cart-email-wrapper',
-                theme: 'light',
-                trigger: 'click',
-                hideOnClick: true,
-                interactive: true,
-                arrow: true,
-                distance: 15,
-                placement: 'bottom',
-                wait: function(show) {
-                    /**
-                     * Only show if add to cart seen not true.
-                     */
-                    if (!addToCartSeen) {
-                        show();
-                    }
-                },
-                onShow: function() {
-                    /**
-                     * Set the add to cart fomr as having been senen so it doesn't get shown again.
-                     */
-                    addToCartSeen = true;
 
-                    /**
-                     * Make an AJAX request to set the add cart form as 'seen'.
-                     */
-                    var data = {
-                        action: 'metorik_add_cart_form_seen',
-                        security: metorik_params.nonce,
-                    };
+        if ($('.add-cart-email-wrapper').length) {
+            // classes/buttons that we're targeting
+            var classes = [".button.ajax_add_to_cart", ".single_add_to_cart_button"];
 
-                    $.post(metorik_params.ajaxurl, data, function(response) {
-                        //
-                    });
-                },
+            // add tippy for each class
+            classes.forEach(function(c) {
+                tippy(c, {
+                    html: '.add-cart-email-wrapper',
+                    theme: 'light',
+                    trigger: 'click',
+                    hideOnClick: true,
+                    interactive: true,
+                    arrow: true,
+                    distance: 15,
+                    placement: 'bottom',
+                    wait: function(show) {
+                        // Only show if add to cart seen not true. Delay 100ms
+                        if(!addToCartSeen) {
+                            setTimeout(function() {
+                                show();
+                            }, 200);
+                        }
+                    },
+                    onShow: function () {
+                        // Set the add to cart fomr as having been senen so it doesn't get shown again.
+                        addToCartSeen = true;
+
+                        // Make an AJAX request to set the add cart form as 'seen'.
+                        var data = {
+                            action: 'metorik_add_cart_form_seen',
+                            security: metorik_params.nonce,
+                        };
+
+                        $.post(metorik_params.ajaxurl, data, function (response) {
+                            //
+                        });
+                    },
+                });
             });
         }
 

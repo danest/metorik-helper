@@ -122,6 +122,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 == Changelog ==
 = 1.0.3 =
 * Fix add to cart popup bug where it sometimes showed at the bottom of the page.
+* Show add to cart popup on single product pages too (if the button is AJAX).
 
 = 1.0.2 =
 * Improve cart token setting for guests that log in or register during their session.
