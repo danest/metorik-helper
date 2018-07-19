@@ -132,6 +132,19 @@
             // classes/buttons that we're targeting
             var classes = [".button.ajax_add_to_cart", ".single_add_to_cart_button"];
 
+            // listen for page reloads after products added to the cart
+            $(document.body).on(
+                'wc_fragments_refreshed',
+                function (e) {
+                    // only if cart items 1 or more
+                    if (metorik_params.cart_items >= 1) {
+                        // show tippy on add cart button
+                        const button = $('.single_add_to_cart_button');
+                        button[0]._tippy.show();
+                    }
+                }
+            );
+
             // add tippy for each class
             classes.forEach(function(c) {
                 tippy(c, {
