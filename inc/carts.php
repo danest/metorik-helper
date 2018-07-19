@@ -644,7 +644,7 @@ class Metorik_Helper_Carts
             );
 
             // Output template wrapped in 'add-cart-email-wrapper' div (used by JS)
-            echo '<div class="add-cart-email-wrapper">';
+            echo '<div class="add-cart-email-wrapper" style="display: none;">';
             $this->get_template('add-cart-email-form.php', $args);
             echo '</div>';
         }
