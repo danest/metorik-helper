@@ -130,7 +130,11 @@
 
         if ($('.add-cart-email-wrapper').length) {
             // classes/buttons that we're targeting
-            var classes = [".button.ajax_add_to_cart", ".single_add_to_cart_button"];
+            var classes = [
+                '.button.ajax_add_to_cart',
+                '.single_add_to_cart_button',
+                '.button.checkout-button',
+            ];
 
             // listen for page reloads after products added to the cart
             $(document.body).on(
@@ -139,8 +143,16 @@
                     // only if cart items 1 or more
                     if (metorik_params.cart_items >= 1) {
                         // show tippy on add cart button
-                        const button = $('.single_add_to_cart_button');
-                        button[0]._tippy.show();
+                        const singleButton = $('.single_add_to_cart_button');
+                        if (singleButton.length) {
+                            singleButton[0]._tippy.show();
+                        }
+
+                        // show tippy on cart update button
+                        const cartButton = $('.button.checkout-button');
+                        if (cartButton.length) {
+                            cartButton[0]._tippy.show();
+                        }
                     }
                 }
             );
@@ -155,7 +167,7 @@
                     interactive: true,
                     arrow: true,
                     distance: 15,
-                    placement: 'bottom',
+                    placement: (c == '.button.checkout-button') ? 'left' : 'bottom',
                     wait: function(show) {
                         // Only show if add to cart seen not true. Delay 100ms
                         if(!addToCartSeen) {
