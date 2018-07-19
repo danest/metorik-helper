@@ -148,7 +148,7 @@
                         if(!addToCartSeen) {
                             setTimeout(function() {
                                 show();
-                            }, 200);
+                            }, 250);
                         }
                     },
                     onShow: function () {
