@@ -152,10 +152,12 @@
                             singleButton[0]._tippy.show();
                         }
 
-                        // show tippy on cart update button
-                        const cartButton = $('.button.checkout-button');
-                        if (cartButton.length) {
-                            cartButton[0]._tippy.show();
+                        // show tippy on cart update button (if cart checkout button enabled)
+                        if (metorik_params.cart_checkout_button) {
+                            const cartButton = $('.button.checkout-button');
+                            if (cartButton.length) {
+                                cartButton[0]._tippy.show();
+                            }
                         }
                     }
                 }
