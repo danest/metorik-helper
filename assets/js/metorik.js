@@ -127,42 +127,76 @@
          * Popup to capture email when added to cart (if wrapper class exists/output on page).
          */
         var addToCartSeen = false;
-        if ($('.add-cart-email-wrapper').length && $('.button.ajax_add_to_cart').length) {
-            tippy('.button.ajax_add_to_cart', {
-                html: '.add-cart-email-wrapper',
-                theme: 'light',
-                trigger: 'click',
-                hideOnClick: true,
-                interactive: true,
-                arrow: true,
-                distance: 15,
-                placement: 'bottom',
-                wait: function(show) {
-                    /**
-                     * Only show if add to cart seen not true.
-                     */
-                    if (!addToCartSeen) {
-                        show();
+
+        if ($('.add-cart-email-wrapper').length) {
+            // classes/buttons that we're targeting
+            var classes = [
+                '.button.ajax_add_to_cart',
+                '.single_add_to_cart_button',
+            ];
+
+            // add cart checkout button if enabled (filterable)
+            if (metorik_params.cart_checkout_button) {
+                classes.push('.button.checkout-button');
+            }
+
+            // listen for page reloads after products added to the cart
+            $(document.body).on(
+                'wc_fragments_refreshed',
+                function (e) {
+                    // only if cart items 1 or more
+                    if (metorik_params.cart_items >= 1) {
+                        // show tippy on add cart button
+                        const singleButton = $('.single_add_to_cart_button');
+                        if (singleButton.length) {
+                            singleButton[0]._tippy.show();
+                        }
+
+                        // show tippy on cart update button (if cart checkout button enabled)
+                        if (metorik_params.cart_checkout_button) {
+                            const cartButton = $('.button.checkout-button');
+                            if (cartButton.length) {
+                                cartButton[0]._tippy.show();
+                            }
+                        }
                     }
-                },
-                onShow: function() {
-                    /**
-                     * Set the add to cart fomr as having been senen so it doesn't get shown again.
-                     */
-                    addToCartSeen = true;
+                }
+            );
 
-                    /**
-                     * Make an AJAX request to set the add cart form as 'seen'.
-                     */
-                    var data = {
-                        action: 'metorik_add_cart_form_seen',
-                        security: metorik_params.nonce,
-                    };
+            // add tippy for each class
+            classes.forEach(function(c) {
+                tippy(c, {
+                    html: '.add-cart-email-wrapper',
+                    theme: 'light',
+                    trigger: (c == '.button.ajax_add_to_cart') ? 'click' : 'manual',
+                    hideOnClick: true,
+                    interactive: true,
+                    arrow: true,
+                    distance: 15,
+                    placement: (c == '.button.checkout-button') ? 'left' : 'bottom',
+                    wait: function(show) {
+                        // Only show if add to cart seen not true. Delay 100ms
+                        if(!addToCartSeen) {
+                            setTimeout(function() {
+                                show();
+                            }, 250);
+                        }
+                    },
+                    onShow: function () {
+                        // Set the add to cart fomr as having been senen so it doesn't get shown again.
+                        addToCartSeen = true;
 
-                    $.post(metorik_params.ajaxurl, data, function(response) {
-                        //
-                    });
-                },
+                        // Make an AJAX request to set the add cart form as 'seen'.
+                        var data = {
+                            action: 'metorik_add_cart_form_seen',
+                            security: metorik_params.nonce,
+                        };
+
+                        $.post(metorik_params.ajaxurl, data, function (response) {
+                            //
+                        });
+                    },
+                });
             });
         }
 
