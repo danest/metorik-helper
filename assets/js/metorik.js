@@ -162,7 +162,7 @@
                 tippy(c, {
                     html: '.add-cart-email-wrapper',
                     theme: 'light',
-                    trigger: 'click',
+                    trigger: (c == '.button.ajax_add_to_cart') ? 'click' : 'manual',
                     hideOnClick: true,
                     interactive: true,
                     arrow: true,
