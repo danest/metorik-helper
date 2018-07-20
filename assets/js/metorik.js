@@ -133,8 +133,12 @@
             var classes = [
                 '.button.ajax_add_to_cart',
                 '.single_add_to_cart_button',
-                '.button.checkout-button',
             ];
+
+            // add cart checkout button if enabled (filterable)
+            if (metorik_params.cart_checkout_button) {
+                classes.push('.button.checkout-button');
+            }
 
             // listen for page reloads after products added to the cart
             $(document.body).on(
