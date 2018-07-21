@@ -74,13 +74,13 @@ class Metorik_Custom
          * Pass parameters to Metorik JS.
          */
         $params = array(
-            'lifetime'              => (int) apply_filters('metorik_cookie_lifetime', 6), // 6 months
-            'session'               => (int) apply_filters('metorik_session_length', 30), // 30 minutes
-            'ajaxurl'               => admin_url('admin-ajax.php'),
-            'nonce'                 => wp_create_nonce('metorik-js'),
-            'cart_tracking'         => get_option('metorik_auth_token') ? true : false,
-            'cart_items'            => WC()->cart->get_cart_contents_count(),
-            'cart_checkout_button'  => apply_filters('metorik_acp_checkout_button', true),
+            'lifetime'                 => (int) apply_filters('metorik_cookie_lifetime', 6), // 6 months
+            'session'                  => (int) apply_filters('metorik_session_length', 30), // 30 minutes
+            'ajaxurl'                  => admin_url('admin-ajax.php'),
+            'nonce'                    => wp_create_nonce('metorik-js'),
+            'cart_tracking'            => get_option('metorik_auth_token') ? true : false,
+            'cart_items'               => WC()->cart->get_cart_contents_count(),
+            'cart_checkout_button'     => apply_filters('metorik_acp_checkout_button', true),
             'add_cart_popup_placement' => apply_filters('metorik_acp_placement', 'bottom'),
         );
         wp_localize_script('metorik-js', 'metorik_params', $params);
