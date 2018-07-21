@@ -81,6 +81,7 @@ class Metorik_Custom
             'cart_tracking'         => get_option('metorik_auth_token') ? true : false,
             'cart_items'            => WC()->cart->get_cart_contents_count(),
             'cart_checkout_button'  => apply_filters('metorik_acp_checkout_button', true),
+            'add_cart_popup_placement' => apply_filters('metorik_acp_placement', 'bottom'),
         );
         wp_localize_script('metorik-js', 'metorik_params', $params);
     }
