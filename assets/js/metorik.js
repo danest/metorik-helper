@@ -173,7 +173,7 @@
                     interactive: true,
                     arrow: true,
                     distance: 15,
-                    placement: (c == '.button.checkout-button') ? 'left' : 'bottom',
+                    placement: metorik_params.add_cart_popup_placement,
                     wait: function(show) {
                         // Only show if add to cart seen not true. Delay 100ms
                         if(!addToCartSeen) {
