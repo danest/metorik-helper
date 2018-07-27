@@ -79,7 +79,7 @@ class Metorik_Helper
      */
     public function no_wc()
     {
-        echo '<div class="notice notice-error"><p>'.sprintf(__('Metorik Helper requires %s to be installed and active.', 'metorik-helper'), '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>').'</p></div>';
+        echo '<div class="notice notice-error"><p>'.sprintf(__('Metorik Helper requires %s to be installed and active.', 'metorik'), '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>').'</p></div>';
     }
 
     /**
@@ -99,7 +99,7 @@ class Metorik_Helper
     public function activate_notice()
     {
         if (get_option('metorik_show_activation_notice', false)) {
-            echo '<div class="notice notice-success"><p>'.sprintf(__('The Metorik Helper is active! Go back to %s to complete the connection.', 'metorik-helper'), '<a href="https://app.metorik.com/" target="_blank">Metorik</a>').'</p></div>';
+            echo '<div class="notice notice-success"><p>'.sprintf(__('The Metorik Helper is active! Go back to %s to complete the connection.', 'metorik'), '<a href="https://app.metorik.com/" target="_blank">Metorik</a>').'</p></div>';
 
             // Disable notice option
             update_option('metorik_show_activation_notice', false);
