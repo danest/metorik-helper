@@ -79,7 +79,7 @@ class Metorik_Custom
             'ajaxurl'                  => admin_url('admin-ajax.php'),
             'nonce'                    => wp_create_nonce('metorik-js'),
             'cart_tracking'            => get_option('metorik_auth_token') ? true : false,
-            'cart_items'               => WC()->cart->get_cart_contents_count(),
+            'cart_items'               => WC()->cart ? WC()->cart->get_cart_contents_count() : 0,
             'cart_checkout_button'     => apply_filters('metorik_acp_checkout_button', true),
             'add_cart_popup_placement' => apply_filters('metorik_acp_placement', 'bottom'),
         );

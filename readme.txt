@@ -120,6 +120,9 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
+= 1.0.4 =
+* Fix bug when cart object not available and localizing Metorik's JS.
+
 = 1.0.3 =
 * Fix add to cart popup bug where it sometimes showed at the bottom of the page.
 * Show add to cart popup on single product pages and the cart page (after items are added to the cart).
