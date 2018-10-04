@@ -124,6 +124,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 * Fix bug when cart object not available and localizing Metorik's JS.
 * Compiled and minified JS.
 * Filter for changing the cart recovery final URL (by default it takes them to the checkout page).
+* Close button for the add to cart email popup.
 
 = 1.0.3 =
 * Fix add to cart popup bug where it sometimes showed at the bottom of the page.

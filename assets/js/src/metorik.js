@@ -201,6 +201,19 @@
         }
 
         /**
+         * Listen for closing the add cart email form tippy.
+         */
+        $(document).on('click', '.metorik-add-cart-email-form .close-button', function (e) {
+            e.preventDefault();
+
+            // close/hide tippy if have
+            var button = $('.tippy-active');
+            if (button.length && button[0]._tippy) {
+                button[0]._tippy.hide();
+            }
+        });
+
+        /**
          * Listen for add cart email input changes.
          */
         var addCartTimer;
@@ -239,7 +252,7 @@
                 $('.metorik-email-usage-notice').css('display', 'none');
 
                 // close/hide tippy if have
-                var button = $('.button.ajax_add_to_cart.tippy-active');
+                var button = $('.tippy-active');
                 if (button.length && button[0]._tippy) {
                     button[0]._tippy.hide();
                 }

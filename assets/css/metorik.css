@@ -13,6 +13,19 @@
   margin-bottom: 20px;
 }
 
+.metorik-add-cart-email-form .close-button {
+  color: #bbb;
+  cursor: pointer;
+  font-size: 15px;
+  position: absolute;
+  right: 28px;
+  top: 28px;
+}
+
+.metorik-add-cart-email-form .close-button:hover {
+  color: #888;
+}
+
 .metorik-add-cart-email-form .email-input-wrapper {
   position: relative;
 }

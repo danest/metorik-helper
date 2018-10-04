@@ -8,7 +8,9 @@
  * 1. $title - Title (set in Metorik).
  * 2. $email_usage_notice - Email usage notice (if enabled in Metorik and customer didn't opt-out).
  *
- * @version     1.0.0
+ * The version is the most recent version of the Metorik Helper plugin this file was changed in.
+ * 
+ * @version     1.0.4
  */
 if (!defined('ABSPATH')) {
     exit;
@@ -18,6 +20,9 @@ if (!defined('ABSPATH')) {
 <div class="metorik-add-cart-email-form">
     <!-- Title of the popup -->
     <h3><?php echo $title; ?></h3>
+
+    <!-- Close button -->
+    <div class="close-button">x</div>
 
     <!-- Email input wrapper - it's recommended to keep this markup as-is so loading icons can automatically be added -->
     <div class="email-input-wrapper">
