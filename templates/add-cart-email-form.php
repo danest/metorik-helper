@@ -9,7 +9,7 @@
  * 2. $email_usage_notice - Email usage notice (if enabled in Metorik and customer didn't opt-out).
  *
  * The version is the most recent version of the Metorik Helper plugin this file was changed in.
- * 
+ *
  * @version     1.0.4
  */
 if (!defined('ABSPATH')) {
