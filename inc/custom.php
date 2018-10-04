@@ -61,9 +61,7 @@ class Metorik_Custom
         /*
          * Enqueue scripts.
          */
-        wp_enqueue_script('sourcebuster', plugins_url('assets/js/sourcebuster.min.js', dirname(__FILE__)), '', '1.1.0', true);
-        wp_enqueue_script('tippy', plugins_url('assets/js/tippy.min.js', dirname(__FILE__)), '', '2.5.2', true);
-        wp_enqueue_script('metorik-js', plugins_url('assets/js/metorik.js', dirname(__FILE__)), array('sourcebuster', 'tippy', 'jquery'), $this->version, true);
+        wp_enqueue_script('metorik-js', plugins_url('assets/js/metorik.min.js', dirname(__FILE__)), array('jquery'), $this->version, true);
 
         /*
          * Enqueue styles.

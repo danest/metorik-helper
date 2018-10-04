@@ -147,14 +147,14 @@
                     // only if cart items 1 or more
                     if (metorik_params.cart_items >= 1) {
                         // show tippy on add cart button
-                        const singleButton = $('.single_add_to_cart_button');
+                        var singleButton = $('.single_add_to_cart_button');
                         if (singleButton.length) {
                             singleButton[0]._tippy.show();
                         }
 
                         // show tippy on cart update button (if cart checkout button enabled)
                         if (metorik_params.cart_checkout_button) {
-                            const cartButton = $('.button.checkout-button');
+                            var cartButton = $('.button.checkout-button');
                             if (cartButton.length) {
                                 cartButton[0]._tippy.show();
                             }
@@ -239,7 +239,7 @@
                 $('.metorik-email-usage-notice').css('display', 'none');
 
                 // close/hide tippy if have
-                const button = $('.button.ajax_add_to_cart.tippy-active');
+                var button = $('.button.ajax_add_to_cart.tippy-active');
                 if (button.length && button[0]._tippy) {
                     button[0]._tippy.hide();
                 }
