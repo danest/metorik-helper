@@ -406,8 +406,8 @@ class Metorik_Helper_Carts
     {
         // Check token is set and has a value before continuing.
         if (isset($request['token']) && $cart_token = $request['token']) {
-            // base checkout url
-            $checkout_url = wc_get_checkout_url();
+            // base checkout url - filterable
+            $checkout_url = apply_filters('metorik_recover_cart_url', wc_get_checkout_url());
 
             // forward along any UTM or metorik params
             foreach ($request->get_params() as $key => $val) {
