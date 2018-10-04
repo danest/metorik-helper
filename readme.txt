@@ -122,6 +122,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 == Changelog ==
 = 1.0.4 =
 * Fix bug when cart object not available and localizing Metorik's JS.
+* Compiled and minified JS.
 
 = 1.0.3 =
 * Fix add to cart popup bug where it sometimes showed at the bottom of the page.
