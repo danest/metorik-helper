@@ -125,6 +125,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 * Compiled and minified JS.
 * Filter for changing the cart recovery final URL (by default it takes them to the checkout page).
 * Close button for the add to cart email popup.
+* Class to add to inputs for additional custom email input tracking (.metorik-capture-guest-email).
 
 = 1.0.3 =
 * Fix add to cart popup bug where it sometimes showed at the bottom of the page.

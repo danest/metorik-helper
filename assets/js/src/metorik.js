@@ -99,13 +99,13 @@
          * Watch for email input changes.
          */
         var email_input_timer;
-        $('#billing_email').bind('blur', function(e) {
+        $('#billing_email, .metorik-capture-guest-email').bind('blur', function(e) {
             var _this = $(this);
 
             clearTimeout(email_input_timer);
             email_input_timer = setTimeout(function() {
                 if (isValidEmail(_this.val())) {
-                    sendCartData();
+                    sendCartData(_this.val());
                 }
             }, 500);
         });
