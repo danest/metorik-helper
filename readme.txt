@@ -1,4 +1,4 @@
-=== Metorik Helper ===
+=== Metorik - Reports & Email Automation for WooCommerce ===
 Contributors: bryceadams, metorik
 Tags: woocommerce, woocommerce analytics, woocommerce reports, woocommerce filtering, woocommerce google analytics, woocommerce zendesk, woocommerce help scout, woocommerce freshdesk, woocommerce support, subscription reports, woo reports
 Requires at least: 4.4.0
@@ -49,7 +49,7 @@ Writing emails couldn't be easier with Engage's email builder and each automatio
 
 [Metorik tracks every cart](https://metorik.com/carts) started on your store, making it easy for you to see all open, abandoned, and placed carts. Also included is the Carts Report, covering all of your cart-related stats.
 
-And better yet, through Metorik Engage, you can send automatic cart recovery emails to try get customers to complete their purchase.
+And better yet, through Metorik Engage, you can send automatic abandoned cart emails to try get customers to complete their purchase.
 
 = Customer service integrations =
 
