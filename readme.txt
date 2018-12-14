@@ -122,6 +122,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 == Changelog ==
 = 1.0.5 =
 * Don't override customer source on checkout.
+* Change some Metorik URLs to customer/order/etc. pages.
 
 = 1.0.4 =
 * Fix bug when cart object not available and localizing Metorik's JS.
