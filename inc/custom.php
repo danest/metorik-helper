@@ -8,7 +8,7 @@ class Metorik_Custom
     /**
      * Current version of Metorik.
      */
-    public $version = '1.0.4';
+    public $version = '1.0.5';
 
     /**
      * Possible fields.
@@ -49,7 +49,6 @@ class Metorik_Custom
 
         // update
         add_action('woocommerce_checkout_update_order_meta', array($this, 'set_order_source'));
-        add_action('woocommerce_checkout_update_user_meta', array($this, 'set_customer_source'));
         add_action('user_register', array($this, 'set_customer_source'));
     }
 
