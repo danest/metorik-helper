@@ -27,6 +27,9 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
         if (version_compare(WC()->version, '3.0.0', '>=')) {
             add_filter('woocommerce_rest_prepare_shop_order_object', array($this, 'remove_coupon_line_items_meta'), 10, 3);
         }
+
+        // add author to order notes response
+        add_filter('woocommerce_rest_prepare_order_note', array($this, 'add_order_note_author'), 10, 3);
     }
 
     /**
@@ -347,6 +350,23 @@ class Metorik_Helper_API_Orders extends WC_REST_Posts_Controller
         }
 
         return $return;
+    }
+
+    /**
+     * Add some extra data to the order note API endpoint.
+     */
+    public function add_order_note_author($response, $note, $request)
+    {
+        $data = $response->get_data();
+
+        // only if not set already (v3 api + has it)
+        if (!isset($data['author'])) {
+            $data['author'] = __('WooCommerce', 'woocommerce') === $note->comment_author ? 'system' : $note->comment_author;
+        }
+
+        $response->set_data($data);
+
+        return $response;
     }
 }
 

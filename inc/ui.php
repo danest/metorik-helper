@@ -67,7 +67,7 @@ class Metorik_UI
      */
     public function product_box_display($post)
     {
-        echo '<a href="https://app.metorik.com/product/'.$post->ID.'" target="_blank">
+        echo '<a href="https://app.metorik.com/products/'.$post->ID.'" target="_blank">
 			<img src="'.Metorik_Helper()->url.'assets/img/metorik.png" /> View on Metorik <span class="dashicons dashicons-arrow-right-alt2"></span>
 		</a>';
     }
@@ -77,7 +77,7 @@ class Metorik_UI
      */
     public function order_box_display($post)
     {
-        echo '<a href="https://app.metorik.com/order/'.$post->ID.'" target="_blank">
+        echo '<a href="https://app.metorik.com/orders/'.$post->ID.'" target="_blank">
 			<img src="'.Metorik_Helper()->url.'assets/img/metorik.png" /> View on Metorik <span class="dashicons dashicons-arrow-right-alt2"></span>
 		</a>';
     }
@@ -99,7 +99,7 @@ class Metorik_UI
     {
         switch ($column_name) {
             case 'metorik':
-                return '<a href="https://app.metorik.com/customer/'.$user_id.'" target="_blank">View</a>';
+                return '<a href="https://app.metorik.com/customers/'.$user_id.'" target="_blank">View</a>';
                 break;
             default:
         }
