@@ -120,6 +120,9 @@ To hide the links from individual orders/products, you can click the 'Screen Opt
 We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-metorik-notices=yes while logged in as an administrator.
 
 == Changelog ==
+= 1.0.6 =
+* WooCommerce 3.6 fix.
+
 = 1.0.5 =
 * Don't override customer source on checkout.
 * Change some Metorik URLs to customer/order/etc. pages.
