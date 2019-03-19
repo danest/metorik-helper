@@ -11,7 +11,7 @@ class Metorik_Helper_API
     public function __construct()
     {
         // We must only include after this action since Woo 3.6+ uses it - https://github.com/woocommerce/woocommerce/commit/cd4039e07885b76d55dbccd4ab72edbe67c87628
-        add_action('rest_api_init', array( $this, 'includes' ), 5);
+        add_action('rest_api_init', array($this, 'includes'), 5);
     }
 
     /**
