@@ -322,13 +322,14 @@ class Metorik_Helper_Carts
      * Get data about the client's current session - eg. coupons, shipping.
      * Later maybe more customer info like addresses.
      */
-    public function get_client_session_data() {
-		return array(
-			'applied_coupons' => WC()->session->get( 'applied_coupons' ),
-			'chosen_shipping_methods' => WC()->session->get( 'chosen_shipping_methods' ),
-			'shipping_method_counts' => WC()->session->get( 'shipping_method_counts' ),
-			'chosen_payment_method' => WC()->session->get( 'chosen_payment_method' ),
-		);
+    public function get_client_session_data()
+    {
+        return array(
+            'applied_coupons'         => WC()->session->get('applied_coupons'),
+            'chosen_shipping_methods' => WC()->session->get('chosen_shipping_methods'),
+            'shipping_method_counts'  => WC()->session->get('shipping_method_counts'),
+            'chosen_payment_method'   => WC()->session->get('chosen_payment_method'),
+        );
     }
 
     /**
