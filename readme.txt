@@ -122,6 +122,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 == Changelog ==
 = 1.0.6 =
 * WooCommerce 3.6 fix.
+* Apply coupons provided through a certain URL parameter (Metorik Engage).
 
 = 1.0.5 =
 * Don't override customer source on checkout.
