@@ -516,7 +516,42 @@ class Metorik_Helper_Carts
             update_user_meta($user_id, '_metorik_cart_token', $cart_token);
             update_user_meta($user_id, '_metorik_pending_recovery', true);
         }
+
+        // Client session
+        $session = $body->data->client_session;
+        if ($session) {
+            $applied_coupons = (array) $session->applied_coupons;
+            $chosen_shipping_methods = (array) $session->chosen_shipping_methods;
+            $shipping_method_counts = (array) $session->shipping_method_counts;
+            $chosen_payment_method = $session->chosen_payment_method;
+
+            WC()->session->set('applied_coupons', $this->return_valid_coupons($applied_coupons));
+            WC()->session->set('chosen_shipping_methods', $chosen_shipping_methods);
+            WC()->session->set('shipping_method_counts', $shipping_method_counts);
+            WC()->session->set('chosen_payment_method', $chosen_payment_method);
+        }
     }
+
+	/**
+	 * Returns valid coupons for applying above.
+	 */
+	private function return_valid_coupons($coupons) {
+		$valid_coupons = array();
+
+		if ($coupons) {
+			foreach ($coupons as $coupon_code) {
+				$the_coupon = new WC_Coupon($coupon_code);
+
+				if (! $the_coupon->is_valid()) {
+					continue;
+				}
+
+				$valid_coupons[] = $coupon_code;
+			}
+        }
+        
+		return $valid_coupons;
+	}
 
     /**
      * Get a cart setting (stored in metorik.php over API).
