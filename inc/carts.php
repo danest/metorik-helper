@@ -235,6 +235,7 @@ class Metorik_Helper_Carts
                 'email'             => $email,
                 'name'              => $name,
                 'email_opt_out'     => $this->get_customer_email_opt_out(),
+                'client_session'    => $this->get_client_session_data(),
             ),
         );
 
@@ -318,6 +319,25 @@ class Metorik_Helper_Carts
     }
 
     /**
+     * Get data about the client's current session - eg. coupons, shipping.
+     * Later maybe more customer info like addresses.
+     */
+    public function get_client_session_data()
+    {
+        // No session? Stop
+        if (!WC()->session) {
+            return;
+        }
+
+        return array(
+            'applied_coupons'         => WC()->session->get('applied_coupons'),
+            'chosen_shipping_methods' => WC()->session->get('chosen_shipping_methods'),
+            'shipping_method_counts'  => WC()->session->get('shipping_method_counts'),
+            'chosen_payment_method'   => WC()->session->get('chosen_payment_method'),
+        );
+    }
+
+    /**
      * Link a customer's existing cart when logging in.
      */
     public function link_customer_existing_cart($user_login, $user)
@@ -372,15 +392,14 @@ class Metorik_Helper_Carts
 
     /**
      * Maybe apply the recovery coupon provided in the recovery URL.
-     *
-     * @since 1.1.0
      */
     public function maybe_apply_cart_recovery_coupon()
     {
         if ($this->cart_is_pending_recovery() && !empty($_REQUEST['coupon'])) {
             $coupon_code = wc_clean(rawurldecode($_REQUEST['coupon']));
 
-            if (!WC()->cart->has_discount($coupon_code)) {
+            if (WC()->cart && !WC()->cart->has_discount($coupon_code)) {
+                WC()->cart->calculate_totals();
                 WC()->cart->add_discount($coupon_code);
             }
         }
@@ -501,6 +520,42 @@ class Metorik_Helper_Carts
             update_user_meta($user_id, '_metorik_cart_token', $cart_token);
             update_user_meta($user_id, '_metorik_pending_recovery', true);
         }
+
+        // Client session
+        $session = $body->data->client_session;
+        if ($session) {
+            $applied_coupons = (array) $session->applied_coupons;
+            $chosen_shipping_methods = (array) $session->chosen_shipping_methods;
+            $shipping_method_counts = (array) $session->shipping_method_counts;
+            $chosen_payment_method = $session->chosen_payment_method;
+
+            WC()->session->set('applied_coupons', $this->return_valid_coupons($applied_coupons));
+            WC()->session->set('chosen_shipping_methods', $chosen_shipping_methods);
+            WC()->session->set('shipping_method_counts', $shipping_method_counts);
+            WC()->session->set('chosen_payment_method', $chosen_payment_method);
+        }
+    }
+
+    /**
+     * Returns valid coupons for applying above.
+     */
+    private function return_valid_coupons($coupons)
+    {
+        $valid_coupons = array();
+
+        if ($coupons) {
+            foreach ($coupons as $coupon_code) {
+                $the_coupon = new WC_Coupon($coupon_code);
+
+                if (!$the_coupon->is_valid()) {
+                    continue;
+                }
+
+                $valid_coupons[] = $coupon_code;
+            }
+        }
+
+        return $valid_coupons;
     }
 
     /**
