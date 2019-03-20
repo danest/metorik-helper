@@ -387,8 +387,6 @@ class Metorik_Helper_Carts
 
     /**
      * Maybe apply the recovery coupon provided in the recovery URL.
-     *
-     * @since 1.1.0
      */
     public function maybe_apply_cart_recovery_coupon()
     {
