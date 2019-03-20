@@ -235,6 +235,7 @@ class Metorik_Helper_Carts
                 'email'             => $email,
                 'name'              => $name,
                 'email_opt_out'     => $this->get_customer_email_opt_out(),
+                'client_session'    => $this->get_client_session_data(),
             ),
         );
 
@@ -318,6 +319,19 @@ class Metorik_Helper_Carts
     }
 
     /**
+     * Get data about the client's current session - eg. coupons, shipping.
+     * Later maybe more customer info like addresses.
+     */
+    public function get_client_session_data() {
+		return array(
+			'applied_coupons' => WC()->session->get( 'applied_coupons' ),
+			'chosen_shipping_methods' => WC()->session->get( 'chosen_shipping_methods' ),
+			'shipping_method_counts' => WC()->session->get( 'shipping_method_counts' ),
+			'chosen_payment_method' => WC()->session->get( 'chosen_payment_method' ),
+		);
+    }
+
+    /**
      * Link a customer's existing cart when logging in.
      */
     public function link_customer_existing_cart($user_login, $user)
@@ -380,7 +394,8 @@ class Metorik_Helper_Carts
         if ($this->cart_is_pending_recovery() && !empty($_REQUEST['coupon'])) {
             $coupon_code = wc_clean(rawurldecode($_REQUEST['coupon']));
 
-            if (!WC()->cart->has_discount($coupon_code)) {
+            if (WC()->cart && !WC()->cart->has_discount($coupon_code)) {
+                WC()->cart->calculate_totals();
                 WC()->cart->add_discount($coupon_code);
             }
         }
