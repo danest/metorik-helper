@@ -324,6 +324,11 @@ class Metorik_Helper_Carts
      */
     public function get_client_session_data()
     {
+        // No session? Stop
+        if (! WC()->session) {
+            return null;
+        }
+
         return array(
             'applied_coupons'         => WC()->session->get('applied_coupons'),
             'chosen_shipping_methods' => WC()->session->get('chosen_shipping_methods'),
