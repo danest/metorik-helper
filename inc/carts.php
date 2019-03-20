@@ -533,26 +533,27 @@ class Metorik_Helper_Carts
         }
     }
 
-	/**
-	 * Returns valid coupons for applying above.
-	 */
-	private function return_valid_coupons($coupons) {
-		$valid_coupons = array();
+    /**
+     * Returns valid coupons for applying above.
+     */
+    private function return_valid_coupons($coupons)
+    {
+        $valid_coupons = array();
 
-		if ($coupons) {
-			foreach ($coupons as $coupon_code) {
-				$the_coupon = new WC_Coupon($coupon_code);
+        if ($coupons) {
+            foreach ($coupons as $coupon_code) {
+                $the_coupon = new WC_Coupon($coupon_code);
 
-				if (! $the_coupon->is_valid()) {
-					continue;
-				}
+                if (!$the_coupon->is_valid()) {
+                    continue;
+                }
 
-				$valid_coupons[] = $coupon_code;
-			}
+                $valid_coupons[] = $coupon_code;
+            }
         }
-        
-		return $valid_coupons;
-	}
+
+        return $valid_coupons;
+    }
 
     /**
      * Get a cart setting (stored in metorik.php over API).
