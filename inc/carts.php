@@ -325,8 +325,8 @@ class Metorik_Helper_Carts
     public function get_client_session_data()
     {
         // No session? Stop
-        if (! WC()->session) {
-            return null;
+        if (!WC()->session) {
+            return;
         }
 
         return array(
