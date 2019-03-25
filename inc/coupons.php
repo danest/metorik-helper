@@ -33,7 +33,7 @@ class Metorik_Coupons
         WC()->session->set('mtk_coupon', $coupon_code);
 
         // If there is an existing non empty cart active session we apply the coupon
-        if (WC()->cart && !WC()->cart->is_empty()) {
+        if (WC()->cart && !WC()->cart->is_empty() && !WC()->cart->has_discount($coupon_code)) {
             WC()->cart->calculate_totals();
             WC()->cart->add_discount($coupon_code);
 
