@@ -8,15 +8,16 @@ class Metorik_Coupons
     public function __construct()
     {
         add_action('wp_loaded', array($this, 'add_coupon_code_to_cart_session'));
-        add_action('woocommerce_add_to_cart', array($this, 'add_coupon_code_to_cart') );
+        add_action('woocommerce_add_to_cart', array($this, 'add_coupon_code_to_cart'));
     }
 
     /**
-     * Add a coupon code to the cart session
+     * Add a coupon code to the cart session.
      *
      * @return void
      */
-    public function add_coupon_code_to_cart_session() {
+    public function add_coupon_code_to_cart_session()
+    {
         // Stop if no code in URL
         if (empty($_GET['mtkc'])) {
             return;
@@ -32,7 +33,7 @@ class Metorik_Coupons
         WC()->session->set('mtk_coupon', $coupon_code);
 
         // If there is an existing non empty cart active session we apply the coupon
-        if (WC()->cart && ! WC()->cart->is_empty()) {
+        if (WC()->cart && !WC()->cart->is_empty()) {
             WC()->cart->calculate_totals();
             WC()->cart->add_discount($coupon_code);
 
@@ -44,16 +45,17 @@ class Metorik_Coupons
     /**
      * Add the Metorik session coupon code to the cart when adding a product.
      */
-    public function add_coupon_code_to_cart() {
+    public function add_coupon_code_to_cart()
+    {
         $coupon_code = WC()->session ? WC()->session->get('mtk_coupon') : false;
 
         // no coupon code? stop
-        if (! $coupon_code || empty($coupon_code)) {
+        if (!$coupon_code || empty($coupon_code)) {
             return;
         }
 
         // only if have a cart but not this discount yet
-        if (WC()->cart && ! WC()->cart->has_discount($coupon_code)) {
+        if (WC()->cart && !WC()->cart->has_discount($coupon_code)) {
             WC()->cart->calculate_totals();
             WC()->cart->add_discount($coupon_code);
 
