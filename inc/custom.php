@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Custom changes that Metorik implements, like tracking referer and coupon applying.
+ * Custom changes that Metorik implements, like tracking referer.
  */
 class Metorik_Custom
 {
     /**
      * Current version of Metorik.
      */
-    public $version = '1.1.0';
+    public $version = '1.1.1';
 
     /**
      * Possible fields.
@@ -50,9 +50,6 @@ class Metorik_Custom
         // update
         add_action('woocommerce_checkout_update_order_meta', array($this, 'set_order_source'));
         add_action('user_register', array($this, 'set_customer_source'));
-
-        // coupons
-        add_action('woocommerce_cart_loaded_from_session', array($this, 'maybe_apply_coupon'), 12);
     }
 
     /**
@@ -167,21 +164,6 @@ class Metorik_Custom
         foreach ($values as $key => $value) {
             if ($value && $value !== '(none)') {
                 $update_function($id, '_metorik_'.$key, $value);
-            }
-        }
-    }
-
-    /**
-     * Maybe apply a coupon if one has been passed in with the ?mtkc URL param.
-     */
-    public function maybe_apply_coupon()
-    {
-        if (!empty($_REQUEST['mtkc'])) {
-            $coupon_code = wc_clean(rawurldecode($_REQUEST['mtkc']));
-
-            if (WC()->cart && !WC()->cart->has_discount($coupon_code)) {
-                WC()->cart->calculate_totals();
-                WC()->cart->add_discount($coupon_code);
             }
         }
     }
