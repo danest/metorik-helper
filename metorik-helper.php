@@ -76,7 +76,7 @@ class Metorik_Helper
         }
 
         // Plugin textdomain
-        load_plugin_textdomain( 'metorik', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+        load_plugin_textdomain('metorik', false, basename(dirname(__FILE__)).'/languages/');
     }
 
     /**
