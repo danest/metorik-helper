@@ -46,6 +46,42 @@ class Metorik_Helper_Carts
     }
 
     /**
+     * Check any prerequisites required for our add to cart request.
+     * From https://barn2.co.uk/managing-cart-rest-api-woocommerce-3-6/.
+     */
+    private function check_prerequisites()
+    {
+        if (defined('WC_ABSPATH')) {
+            // WC 3.6+ - Cart and notice functions are not included during a REST request.
+            include_once WC_ABSPATH.'includes/wc-cart-functions.php';
+            include_once WC_ABSPATH.'includes/wc-notice-functions.php';
+        }
+
+        if (null === WC()->session) {
+            $session_class = apply_filters('woocommerce_session_handler', 'WC_Session_Handler');
+
+            //Prefix session class with global namespace if not already namespaced
+            if (false === strpos($session_class, '\\')) {
+                $session_class = '\\'.$session_class;
+            }
+
+            WC()->session = new $session_class();
+            WC()->session->init();
+        }
+
+        if (null === WC()->customer) {
+            WC()->customer = new \WC_Customer(get_current_user_id(), true);
+        }
+
+        if (null === WC()->cart) {
+            WC()->cart = new \WC_Cart();
+
+            // We need to force a refresh of the cart contents from session here (cart contents are normally refreshed on wp_loaded, which has already happened by this point).
+            WC()->cart->get_cart();
+        }
+    }
+
+    /**
      * Generate a cart token (md5 of current time & random number).
      *
      * @todo improve.
@@ -425,6 +461,9 @@ class Metorik_Helper_Carts
     {
         // Check token is set and has a value before continuing.
         if (isset($request['token']) && $cart_token = $request['token']) {
+            // cart start
+            $this->check_prerequisites();
+
             // base checkout url - filterable
             $checkout_url = apply_filters('metorik_recover_cart_url', wc_get_checkout_url());
 
@@ -436,7 +475,7 @@ class Metorik_Helper_Carts
             }
 
             // no session? start so cart/notices work
-            if (!WC()->session->has_session()) {
+            if (!WC()->session || (WC()->session && !WC()->session->has_session())) {
                 WC()->session->set_customer_session_cookie(true);
             }
 

@@ -3,9 +3,10 @@
  * Plugin Name: Metorik Helper
  * Plugin URI: https://metorik.com
  * Description: Reports, integrations, automatic emails, and cart tracking for WooCommerce stores.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Metorik
  * Author URI: https://metorik.com
+ * Text Domain: metorik
  * WC requires at least: 2.6.0
  * WC tested up to: 3.6.0.
  */
@@ -14,7 +15,7 @@ class Metorik_Helper
     /**
      * Current version of Metorik.
      */
-    public $version = '1.1.1';
+    public $version = '1.1.2';
 
     /**
      * URL dir for plugin.
@@ -73,6 +74,9 @@ class Metorik_Helper
         } else {
             add_action('admin_notices', array($this, 'no_wc'));
         }
+
+        // Plugin textdomain
+        load_plugin_textdomain('metorik', false, basename(dirname(__FILE__)).'/languages/');
     }
 
     /**
@@ -80,7 +84,7 @@ class Metorik_Helper
      */
     public function no_wc()
     {
-        echo '<div class="notice notice-error"><p>'.sprintf(__('Metorik Helper requires %s to be installed and active.', 'metorik-helper'), '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>').'</p></div>';
+        echo '<div class="notice notice-error"><p>'.sprintf(__('Metorik Helper requires %s to be installed and active.', 'metorik'), '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>').'</p></div>';
     }
 
     /**
@@ -100,7 +104,7 @@ class Metorik_Helper
     public function activate_notice()
     {
         if (get_option('metorik_show_activation_notice', false)) {
-            echo '<div class="notice notice-success"><p>'.sprintf(__('The Metorik Helper is active! Go back to %s to complete the connection.', 'metorik-helper'), '<a href="https://app.metorik.com/" target="_blank">Metorik</a>').'</p></div>';
+            echo '<div class="notice notice-success"><p>'.sprintf(__('The Metorik Helper is active! Go back to %s to complete the connection.', 'metorik'), '<a href="https://app.metorik.com/" target="_blank">Metorik</a>').'</p></div>';
 
             // Disable notice option
             update_option('metorik_show_activation_notice', false);
