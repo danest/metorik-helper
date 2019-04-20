@@ -122,6 +122,7 @@ We all make mistakes. To get them back, go to http://yoursite.com/wp-admin?show-
 == Changelog ==
 = 1.1.2 =
 * Further WooCommerce 3.6 fixes for cart recovery links.
+* Better i18n support.
 
 = 1.1.1 =
 * Fix coupon-applying through a URL parameter for empty carts.
