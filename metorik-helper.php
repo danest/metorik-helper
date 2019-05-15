@@ -3,7 +3,7 @@
  * Plugin Name: Metorik Helper
  * Plugin URI: https://metorik.com
  * Description: Reports, integrations, automatic emails, and cart tracking for WooCommerce stores.
- * Version: 1.1.2
+ * Version: 1.2.0
  * Author: Metorik
  * Author URI: https://metorik.com
  * Text Domain: metorik
@@ -15,7 +15,7 @@ class Metorik_Helper
     /**
      * Current version of Metorik.
      */
-    public $version = '1.1.2';
+    public $version = '1.2.0';
 
     /**
      * URL dir for plugin.
@@ -70,7 +70,6 @@ class Metorik_Helper
             require_once 'inc/ui.php';
             require_once 'inc/custom.php';
             require_once 'inc/carts.php';
-            require_once 'inc/coupons.php';
         } else {
             add_action('admin_notices', array($this, 'no_wc'));
         }
